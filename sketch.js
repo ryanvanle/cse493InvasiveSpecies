@@ -19,7 +19,7 @@ function setup() {
   handpose.on("predict", results => {
     predictions = results;
   });
-  
+
 }
 
 function draw() {
@@ -33,11 +33,11 @@ function draw() {
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
-    sprites.push(new Sprite()); 
+    sprites.push(new Sprite());
     // nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
     // print(nextSpawnDistance);
   }
-  
+
   // loop through all the sprites and update them
    for(let i = 0; i < sprites.length; i++){
     // check if sprite is in hand
@@ -45,14 +45,14 @@ function draw() {
     let selected = point_in_polygon({x: sprites[i].x, y: sprites[i].y}, bound);
     sprites[i].draw(selected);
     sprites[i].update();
-    
+
     // remove pipes that have gone off the screen
     if(sprites[i].x + sprites[i].width > width){
       sprites.splice(i, 1); // delete 1 item starting at index i
     }
   }
-  
-  
+
+
   // print(sprites);
 }
 
@@ -63,4 +63,4 @@ function resetGame(){
   print(nextSpawnDistance);
 }
 
-// Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw 
+// Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw
