@@ -46,4 +46,17 @@ class Sprite {
       rect(this.x, this.y, spriteWidth, spriteHeight);
     }
   }
+
+  displayInfo() {
+    let description = this.description == null ? 
+                      "friendly" : this.description;  
+    push();
+    fill(0,0,255);
+    stroke(155);
+    rect(this.x, this.y, 60, 80);
+    textSize(12);
+    fill(255,255,255);
+    text(description, this.x + 5, this.y + 10);
+    pop();
+  }
 }

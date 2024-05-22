@@ -17,10 +17,11 @@ function drawKeypoints(predictions) {
       const palmbase = prediction.annotations.palmBase[0];
       
       if (j == prediction.landmarks.length - 1) {
-        vertices.push({x: thumbtip[0], y: thumbtip[1]});
-        vertices.push({x : pinkytip[0], y: pinkytip[1]});
-        vertices.push({x : middlefingertip[0], y : middlefingertip[1]});
-        vertices.push({x: palmbase[0], y : palmbase[1]});
+        // hand is translated by amount width and scaled by -1 in x axis
+        vertices.push({x: -thumbtip[0] + width, y: thumbtip[1]});
+        vertices.push({x : width - pinkytip[0], y: pinkytip[1]});
+        vertices.push({x : width - middlefingertip[0], y : middlefingertip[1]});
+        vertices.push({x: width - palmbase[0], y : palmbase[1]});
       }
       
       
@@ -40,6 +41,7 @@ function drawKeypoints(predictions) {
   return vertices;
 }
 
+// code credit : https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 function point_in_polygon(point, polygon) {
     const num_vertices = polygon.length;
     const x = point.x;
