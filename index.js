@@ -1,14 +1,11 @@
 "use strict";
 let pHtmlMsg;
-let serialOptions = { baudRate: 115200  };
+let serialOptions = { baudRate: 115200 };
 let serial;
 let previousControllerValues = {};
 let previousRawValue = null;
 let currentRawValue;
 let controllerValues = {};
-
-
-
 
 let sprites;
 let nextSpawnDistance;
@@ -16,19 +13,20 @@ let minDistanceBetweenSprites;
 let video;
 let predictions = [];
 let bound = [];
+let score = 0;
 
 function setup() {
-  createCanvas(window.innerWidth, window.innerHeight-50);
+  createCanvas(window.innerWidth, window.innerHeight - 50);
   video = createCapture(VIDEO);
   video.size(width, height);
 
   handpose = ml5.handpose(video, modelReady);
-  minDistanceBetweenSprites = width/5; // at least this much margin between sprites
+  minDistanceBetweenSprites = width / 5; // at least this much margin between sprites
   resetGame();
   // Hide the video element, and just show the canvas
   video.hide();
 
-  handpose.on("predict", results => {
+  handpose.on("predict", (results) => {
     predictions = results;
   });
 
@@ -43,64 +41,59 @@ function setup() {
   // serial.autoConnectAndOpenPreviouslyApprovedPort(serialOptions);
 
   // Add in a lil <p> element to provide messages. This is optional
-  id("data").textContent = "Click anywhere on this page to open the serial connection dialog"
+  id("data").textContent =
+    "Click anywhere on this page to open the serial connection dialog";
 
-  colorMode(RGB)
-
+  colorMode(RGB);
 }
 
 let i = 0;
 
 function draw() {
-
   // Mirror video
-  translate(width,0); // move to far corner
-  scale(-1.0,1.0);
+  translate(width, 0); // move to far corner
+  scale(-1.0, 1.0);
 
   background(220);
   // draw hand
   bound = drawKeypoints(predictions);
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
-  if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
+  if (
+    sprites.length <= 0 ||
+    sprites[sprites.length - 1].x >= nextSpawnDistance
+  ) {
     sprites.push(new Sprite());
     // nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
     // print(nextSpawnDistance);
   }
 
   // loop through all the sprites and update them
-    for(let i = 0; i < sprites.length; i++){
+  for (let i = 0; i < sprites.length; i++) {
     // check if sprite is in hand
     // sprite will turn red if selected
-    let selected = point_in_polygon({x: sprites[i].x, y: sprites[i].y}, bound);
+    let selected = point_in_polygon(
+      { x: sprites[i].x, y: sprites[i].y },
+      bound
+    );
     sprites[i].draw(selected);
     sprites[i].update();
 
     // remove pipes that have gone off the screen
-    if(sprites[i].x + sprites[i].width > width){
+    if (sprites[i].x + sprites[i].width > width) {
       sprites.splice(i, 1); // delete 1 item starting at index i
     }
   }
-
-
 }
 
-function resetGame(){
+function resetGame() {
   score = 0;
   sprites = [new Sprite()];
-  nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
+  nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   print(nextSpawnDistance);
 }
 
-
-function preload() {
-
-}
-
-
-
-
-
+function preload() {}
 
 // serial code
 
@@ -109,7 +102,7 @@ function preload() {
  *
  * @param {} eventSender
  */
- function onSerialErrorOccurred(eventSender, error) {
+function onSerialErrorOccurred(eventSender, error) {
   console.log("onSerialErrorOccurred", error);
   id("data").textContent = error;
 }
@@ -156,14 +149,25 @@ function mouseClicked() {
 }
 
 function processData(newData) {
-
   previousRawValue = currentRawValue;
   currentRawValue = newData;
 
   let dataArray = currentRawValue.split(",");
-  let nameArray = ["x", "y", "z", "xAcceleration", "yAcceleration", "zAcceleration"]
+  let nameArray = [
+    "x",
+    "y",
+    "z",
+    "xAcceleration",
+    "yAcceleration",
+    "zAcceleration",
+  ];
 
-  if (dataArray.length != nameArray.length) console.error("dataArray != nameArray in processData", dataArray, nameArray);
+  if (dataArray.length != nameArray.length)
+    console.error(
+      "dataArray != nameArray in processData",
+      dataArray,
+      nameArray
+    );
 
   previousControllerValues = structuredClone(controllerValues);
   controllerValues = {};
@@ -171,8 +175,6 @@ function processData(newData) {
     controllerValues[nameArray[i]] = Number(dataArray[i]);
   }
 }
-
-
 
 /**
  * Returns the element that has the ID attribute with the specified value.
