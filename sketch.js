@@ -19,41 +19,50 @@ function setup() {
   handpose.on("predict", results => {
     predictions = results;
   });
-
+  
 }
 
 function draw() {
   // Mirror video
-  translate(width,0); // move to far corner
+  push();
+  translate(width,0);
   scale(-1.0,1.0);
 
+  // below this point, canvas origin will be at width.
+  // x axis is mirrored. 
+  // right will be negative and left will be negative.
   background(220);
   // draw hand
   bound = drawKeypoints(predictions);
+  pop();
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
-    sprites.push(new Sprite());
+    sprites.push(new Sprite()); 
     // nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
     // print(nextSpawnDistance);
   }
 
+
+
+  
   // loop through all the sprites and update them
    for(let i = 0; i < sprites.length; i++){
     // check if sprite is in hand
     // sprite will turn red if selected
     let selected = point_in_polygon({x: sprites[i].x, y: sprites[i].y}, bound);
     sprites[i].draw(selected);
+    if (selected) {
+      sprites[i].displayInfo();
+    }
     sprites[i].update();
-
+    
     // remove pipes that have gone off the screen
     if(sprites[i].x + sprites[i].width > width){
       sprites.splice(i, 1); // delete 1 item starting at index i
     }
   }
-
-
-  // print(sprites);
+  
 }
 
 function resetGame(){
@@ -63,4 +72,4 @@ function resetGame(){
   print(nextSpawnDistance);
 }
 
-// Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw
+// Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw 
