@@ -1,30 +1,12 @@
-// "use strict";
-
+"use strict";
 let pHtmlMsg;
 let serialOptions = { baudRate: 115200  };
 let serial;
-
 let previousControllerValues = {};
 let previousRawValue = null;
-
 let currentRawValue;
 let controllerValues = {};
 
-let backgroundImage;
-let xCurrentPosition = 0;
-
-let cursor;
-
-let previousStrokes = [];
-let capybaraImage;
-
-let backgroundImagesStrings = [
-  "desert.jpeg",
-  "meadows.jpeg",
-  "underwater.jpeg"
-]
-
-let stringToImageObject = {}
 
 
 
@@ -115,23 +97,12 @@ function preload() {
 
 }
 
-function processData(newData) {
 
-  previousRawValue = currentRawValue;
-  currentRawValue = newData;
 
-  let dataArray = currentRawValue.split(",");
-  let nameArray = ["x", "y", "z", "xAcceleration", "yAcceleration", "zAcceleration"]
 
-  if (dataArray.length != nameArray.length) console.error("dataArray != nameArray in processData", dataArray, nameArray);
 
-  previousControllerValues = structuredClone(controllerValues);
-  controllerValues = {};
-  for (let i = 0; i < dataArray.length; i++) {
-    controllerValues[nameArray[i]] = Number(dataArray[i]);
-  }
-}
 
+// serial code
 
 /**
  * Callback function by serial.js when there is an error on web serial
@@ -184,12 +155,24 @@ function mouseClicked() {
   }
 }
 
+function processData(newData) {
 
-/** ------------------------------ Helper Functions  ------------------------------ */
-/**
- * Note: You may use these in your code, but remember that your code should not have
- * unused functions. Remove this comment in your own code.
- */
+  previousRawValue = currentRawValue;
+  currentRawValue = newData;
+
+  let dataArray = currentRawValue.split(",");
+  let nameArray = ["x", "y", "z", "xAcceleration", "yAcceleration", "zAcceleration"]
+
+  if (dataArray.length != nameArray.length) console.error("dataArray != nameArray in processData", dataArray, nameArray);
+
+  previousControllerValues = structuredClone(controllerValues);
+  controllerValues = {};
+  for (let i = 0; i < dataArray.length; i++) {
+    controllerValues[nameArray[i]] = Number(dataArray[i]);
+  }
+}
+
+
 
 /**
  * Returns the element that has the ID attribute with the specified value.
