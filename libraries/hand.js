@@ -6,19 +6,18 @@ function modelReady() {
 // A function to draw ellipses over the detected keypoints
 function drawKeypoints(prediction) {
   let vertices = [];
+  const thumbtip = prediction.annotations.thumb[3];
+  const pinkytip = prediction.annotations.pinky[3];
+  const middlefingertip = prediction.annotations.middleFinger[3];
+  const palmbase = prediction.annotations.palmBase[0];
+  
+  // hand is translated by amount width and scaled by -1 in x axis
+  vertices.push({x: width - thumbtip[0], y: thumbtip[1]});
+  vertices.push({x : width - pinkytip[0], y: pinkytip[1]});
+  vertices.push({x : width - middlefingertip[0], y : middlefingertip[1]});
+  vertices.push({x: width - palmbase[0], y : palmbase[1]});
   for (let j = 0; j < prediction.landmarks.length; j += 1) {
     const keypoint = prediction.landmarks[j];
-    const thumbtip = prediction.annotations.thumb[3];
-    const pinkytip = prediction.annotations.pinky[3];
-    const middlefingertip = prediction.annotations.middleFinger[3];
-    const palmbase = prediction.annotations.palmBase[0];
-    
-    // hand is translated by amount width and scaled by -1 in x axis
-    vertices.push({x: width - thumbtip[0], y: thumbtip[1]});
-    vertices.push({x : width - pinkytip[0], y: pinkytip[1]});
-    vertices.push({x : width - middlefingertip[0], y : middlefingertip[1]});
-    vertices.push({x: width - palmbase[0], y : palmbase[1]});
-    
     push();
     fill(0, 255, 0);
     noStroke();
