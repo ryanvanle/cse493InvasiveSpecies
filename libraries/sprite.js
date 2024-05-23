@@ -70,8 +70,18 @@ class Sprite {
     let description = this.description == null ?
                       "friendly" : this.description;
     push();
+
+
+
     rectMode(CENTER)
-    fill(0,0,255);
+
+    let isFriendly = this.description == null;
+    if (isFriendly) {
+      fill("blue");
+    } else {
+      fill("red");
+    }
+
     stroke(155);
     rect(this.x, this.y, spriteWidth + 10, spriteHeight + 10);
     textSize(12);

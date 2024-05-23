@@ -20,6 +20,8 @@ let netScore = 0;
 
 const DEFAULT_NET_SIZE = 75;
 
+let backgroundImage;
+
 net = {
   x: Number(300 / 2),
   y: Number(200 / 2),
@@ -54,6 +56,9 @@ function preload() {
   nativeImages = [loadImage('img/native/american_pika.jpg'),
                     loadImage('img/native/olympic_marmot.jpg'),
                     loadImage('img/native/canada_geese.jpg')];
+
+  backgroundImage = loadImage('img/grass.jpeg')
+
 }
 
 
@@ -95,7 +100,7 @@ function draw() {
   push();
   translate(width,0);
   scale(-1.0,1.0);
-  background(220);
+  background(backgroundImage);
   // draw hand
   if (predictions) {
     bound = drawKeypoints(predictions);
