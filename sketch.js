@@ -140,6 +140,11 @@ function draw() {
     if (selected) {
       sprites[i].displayInfo();
     }
+
+
+
+    let isNetHovering = netSpeciesHoverChecker(sprites[i]);
+    sprites[i].displayNetInfo(isNetHovering);
   }
   // Check if furthest sprite has gone off screen
   // Delete from list to prevent from getting unnecessarily long
@@ -175,11 +180,14 @@ ws.onmessage = (event) => {
 
   // console.log(event.data);
   let data = event.data.split(",");
+  let isPressed = data[3] === "true";
+
+
   netControllerData = {
     x: Number(data[0]),
     y: Number(data[1]),
     z: Number(data[2]),
-    pressed: false
+    pressed: isPressed
   }
 
 };
@@ -206,7 +214,6 @@ function netUpdate() {
     updateNetPosition();
   }
 
-
 }
 
 function drawNetCursor() {
@@ -218,9 +225,36 @@ function drawNetCursor() {
 }
 
 function lockNetPosition() {
+  stroke("red");
+  net.xSpeed = 0;
+  net.ySpeed = 0;
+}
+
+
+function netSpeciesHoverChecker(specie) {
+
+  if (specie.offScreen) return;
+
+  let netRadius = net.diameter/2;
+  let netXEdgeLeft = net.x - netRadius;
+  let netXEdgeRight = net.x + netRadius;
+  let netYEdgeBottom = net.y - netRadius;
+  let netYEdgeTop = net.y + netRadius;
+
+
+
+  let isOutOfBoundsX = specie.x < netXEdgeLeft || specie.x > netXEdgeRight;
+  let isOutOfBoundsY = specie.y < netYEdgeBottom || specie.y > netYEdgeTop;
+
+
+  let isInBoundsNet = !(isOutOfBoundsX || isOutOfBoundsY);
+
+  return isInBoundsNet;
 }
 
 function updateNetPosition() {
+  stroke("black");
+
   net.xSpeed = -netControllerData.y;
   net.ySpeed = -netControllerData.z;
 
@@ -231,15 +265,12 @@ function updateNetPosition() {
 }
 
 function isInNetBoundsChecker() {
-
   let nextXPosition = net.x + net.xSpeed;
   let nextYPosition = net.y + net.ySpeed;
-
   let netRadius = net.diameter/2;
   let isOutOfBoundsX = nextXPosition < 0 + netRadius || nextXPosition > width - netRadius;
   let isOutOfBoundsY = nextYPosition < 0 + netRadius || nextYPosition > height - netRadius;
   let isInBounds = !(isOutOfBoundsX || isOutOfBoundsY);
-
   return isInBounds;
 }
 

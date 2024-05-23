@@ -15,29 +15,32 @@ class Sprite {
     this.isInvasive = random(0, 1) < 0.4; // 40% chance of being invasive
     // const descrIndex = floor(random(0, speciesDescriptions.length));
     this.typeIndex = typeIndex;
+
+    this.isHighlighted = false;
+
     if(this.isInvasive) {
       this.description = speciesDescriptions[this.typeIndex];
 
       // this.spriteImage = invasiveImages[descrIndex];
     }
-    
+
     // Change this to index the corresponding invasive species
     // this.spriteImage = loadImage("images/brown_marmorated_stinkbug.jpg");
     this.offScreen = false;
   }
-  
+
   // checkIfOverlaps(cursor){
   //   // returns true if sprite overlaps with cursor, false otherwise
   //   if((cursor.x + cursor.width > this.x && cursor.x < this.x + this.width) &&
   //      (cursor.y < this.topHeight || (cursor.y + cursor.height) > (height - this.bottomHeight))){
-  //     return true; 
+  //     return true;
   //   }
   //   return false;
   // }
-  
+
   update(){
     // sprites move from left to right
-    this.x += this.speed; 
+    this.x += this.speed;
   }
 
   // Param: takes preloaded image defined by index of sprite
@@ -45,7 +48,18 @@ class Sprite {
     fill(0);
     if(speciesImage) {
       // Draw species sprite
+      push();
+
+      if (this.isHighlighted) {
+        rectMode(CENTER)
+        fill("red");
+        stroke("red");
+        rect(this.x, this.y, spriteWidth + 5, spriteHeight + 5)
+      }
+
+      imageMode(CENTER);
       image(speciesImage, this.x,this.y,spriteWidth,spriteHeight);
+      pop();
     } else {
       print('Sprite image was not defined');
       rect(this.x, this.y, spriteWidth, spriteHeight);
@@ -53,8 +67,8 @@ class Sprite {
   }
 
   displayInfo() {
-    let description = this.description == null ? 
-                      "friendly" : this.description;  
+    let description = this.description == null ?
+                      "friendly" : this.description;
     push();
     fill(0,0,255);
     stroke(155);
@@ -63,5 +77,11 @@ class Sprite {
     fill(255,255,255);
     text(description, this.x + 5, this.y + 10);
     pop();
+  }
+
+  displayNetInfo(isNetHovered) {
+
+    this.isHighlighted = isNetHovered;
+
   }
 }
