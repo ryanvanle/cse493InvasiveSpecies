@@ -6,9 +6,6 @@ function modelReady() {
 // A function to draw ellipses over the detected keypoints
 function drawKeypoints(prediction) {
   let vertices = [];
-  const bb = prediction.boundingBox;
-  const bbWidth = bb.bottomRight[0] - bb.topLeft[0];
-  const bbHeight = bb.bottomRight[1] - bb.topLeft[1];
   for (let j = 0; j < prediction.landmarks.length; j += 1) {
     const keypoint = prediction.landmarks[j];
     const thumbtip = prediction.annotations.thumb[3];
@@ -36,17 +33,10 @@ function drawKeypoints(prediction) {
     pop();
   }
 
-    push();
-    noFill();
-    stroke("red");
-    rect(bb.topLeft[0], bb.topLeft[1], bbWidth, bbHeight);
-    pop();
-
   return vertices;
 }
 
 // code credit : https://observablehq.com/@tmcw/understanding-point-in-polygon
-
 function in_poly(point, polygon) {
   let x = point.x;
   let y = point.y;
