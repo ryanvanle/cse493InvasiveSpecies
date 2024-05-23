@@ -14,8 +14,6 @@ let bound = [];
 let netControllerData;
 let net;
 
-let hasSetup = false;
-
 let netScore = 0;
 
 const DEFAULT_NET_SIZE = 75;
@@ -62,8 +60,6 @@ function preload() {
 }
 
 
-
-
 function setup() {
   createCanvas(640, 480);
   video = createCapture(VIDEO);
@@ -82,10 +78,6 @@ function setup() {
       predictions = null;
     }
   });
-
-
-
-  hasSetup = true;
 
 
 }
@@ -126,6 +118,10 @@ function draw() {
     // remove sprites that have gone off the screen
     if(sprites[i].x + sprites[i].width > width){
       sprites[i].offScreen = true;
+
+      if (sprites.isInvasive) updateScore(false);
+
+
       // Don't delete here because will glitch next sprite
       // Just set to not show
     }
@@ -273,7 +269,7 @@ function isSwingingChecker() {
   if (previousZ <= 0) return false; // is in currentSwing range;
 
 
-  let threshold = 10;
+  let threshold = 5;
   const difference = Math.abs(previousZ - currentZ);
   const isValidSwing = difference >= threshold;
   return isValidSwing;
@@ -305,6 +301,8 @@ function isInNetBoundsChecker() {
 
 function updateCapture() {
 
+  console.log("in updateCapture");
+
   for (let specie of sprites) {
     if (specie.offScreen) continue;
     if (!specie.isHighlighted) continue;
@@ -312,14 +310,65 @@ function updateCapture() {
     specie.offScreen = true;
 
     if (specie.isInvasive) {
-      netScore++;
+      updateScore(true);
     } else {
-      netScore--;
+      updateScore(false);
     }
   }
 
 }
 
 
+function updateScore(didGain) {
+
+  if (didGain) {
+    netScore += 1;
+  } else {
+    netScore--;
+  }
+
+  if (netScore < 0) netScore = 0;
+
+  displayScore();
+}
+
+function displayScore() {
+  id("score").textContent = netScore;
+}
 
 
+/**
+ * Returns the element that has the ID attribute with the specified value.
+ * @param {string} idName - element ID
+ * @returns {object} DOM object associated with id.
+ */
+function id(idName) {
+  return document.getElementById(idName);
+}
+
+/**
+* Returns the first element that matches the given CSS selector.
+* @param {string} selector - CSS query selector.
+* @returns {object} The first DOM object matching the query.
+*/
+function qs(selector) {
+  return document.querySelector(selector);
+}
+
+/**
+* Returns the array of elements that match the given CSS selector.
+* @param {string} selector - CSS query selector
+* @returns {object[]} array of DOM objects matching the query.
+*/
+function qsa(selector) {
+  return document.querySelectorAll(selector);
+}
+
+/**
+* Returns a new element with the given tag name.
+* @param {string} tagName - HTML tag name for new DOM element.
+* @returns {object} New DOM object for given HTML tag.
+*/
+function gen(tagName) {
+  return document.createElement(tagName);
+}

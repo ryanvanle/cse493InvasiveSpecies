@@ -71,8 +71,6 @@ class Sprite {
                       "friendly" : this.description;
     push();
 
-
-
     rectMode(CENTER)
 
     let isFriendly = this.description == null;
