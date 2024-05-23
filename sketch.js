@@ -1,9 +1,24 @@
+// sprite globals
 let sprites;
 let nextSpawnDistance;
 let minDistanceBetweenSprites;
+let invasiveImages;
+let nativeImages;
+
+// handpose globals
 let video;
-let predictions = [];
+let predictions;
 let bound = [];
+
+// Must declare image array in preload to work
+// Invariant: # of invasive and non-invasive species must be the same.
+// Each Sprite has an image index that is the same across invasive and native variants
+function preload() {
+  invasiveImages = [loadImage('img/brown_marmorated_stinkbug.jpg'), 
+                    loadImage('img/american_bullfrog.png'),
+                    loadImage('img/garlic_mustard.jpg')];
+  nativeImages = [];
+}
 
 function setup() {
   createCanvas(640, 480);
@@ -17,9 +32,12 @@ function setup() {
   video.hide();
 
   handpose.on("predict", results => {
-    predictions = results;
+    if (results && results.length > 0) {
+      predictions = results[0];
+    } else {
+      predictions = null;
+    }
   });
-  
 }
 
 function draw() {
@@ -27,42 +45,53 @@ function draw() {
   push();
   translate(width,0);
   scale(-1.0,1.0);
-
-  // below this point, canvas origin will be at width.
-  // x axis is mirrored. 
-  // right will be negative and left will be negative.
   background(220);
   // draw hand
-  bound = drawKeypoints(predictions);
+  if (predictions) {
+    bound = drawKeypoints(predictions);
+  }
   pop();
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
-    sprites.push(new Sprite()); 
+    sprites.push(getNewSprite()); 
     // nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
     // print(nextSpawnDistance);
   }
 
-
-
-  
   // loop through all the sprites and update them
-   for(let i = 0; i < sprites.length; i++){
+  for(let i = 0; i < sprites.length; i++){
     // check if sprite is in hand
     // sprite will turn red if selected
-    let selected = point_in_polygon({x: sprites[i].x, y: sprites[i].y}, bound);
-    sprites[i].draw(selected);
+    let selected = in_poly({x: sprites[i].x, y: sprites[i].y}, bound);
+    
+    sprites[i].update();
+    
+    // remove sprites that have gone off the screen
+    if(sprites[i].x + sprites[i].width > width){
+      sprites[i].offScreen = true;
+      // Don't delete here because will glitch next sprite
+      // Just set to not show
+    }
+
+    // Only draw on screen sprites
+    if(!sprites[i].offScreen) {
+      if(sprites[i].isInvasive){
+        print(invasiveImages);
+        sprites[i].draw(invasiveImages[sprites[i].typeIndex]);
+      } else {
+        sprites[i].draw(null);
+      }
+    }
     if (selected) {
       sprites[i].displayInfo();
     }
-    sprites[i].update();
-    
-    // remove pipes that have gone off the screen
-    if(sprites[i].x + sprites[i].width > width){
-      sprites.splice(i, 1); // delete 1 item starting at index i
-    }
   }
-  
+  // Check if furthest sprite has gone off screen
+  // Delete from list to prevent from getting unnecessarily long
+  if(sprites[0].offScreen) {
+    sprites.splice(0, 1);
+  }
 }
 
 function resetGame(){
@@ -70,6 +99,12 @@ function resetGame(){
   sprites = [new Sprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
   print(nextSpawnDistance);
+}
+
+// generate a new sprite
+function getNewSprite() {
+  const typeIndex = floor(random(0, invasiveImages.length));
+  return new Sprite(typeIndex);
 }
 
 // Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw 

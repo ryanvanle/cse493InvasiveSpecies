@@ -51,12 +51,13 @@ let i = 0;
 
 function draw() {
   // Mirror video
-  translate(width, 0); // move to far corner
-  scale(-1.0, 1.0);
-
+  push();
+  translate(width,0);
+  scale(-1.0,1.0);
   background(220);
   // draw hand
   bound = drawKeypoints(predictions);
+  pop();
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
@@ -77,6 +78,9 @@ function draw() {
       bound
     );
     sprites[i].draw(selected);
+    if (selected) {
+      sprites[i].displayInfo();
+    }
     sprites[i].update();
 
     // remove pipes that have gone off the screen
