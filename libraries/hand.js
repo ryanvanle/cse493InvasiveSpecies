@@ -19,13 +19,6 @@ function drawKeypoints(prediction) {
     vertices.push({x : width - middlefingertip[0], y : middlefingertip[1]});
     vertices.push({x: width - palmbase[0], y : palmbase[1]});
     
-    
-    stroke(155);
-    line(thumbtip[0], thumbtip[1] , middlefingertip[0], middlefingertip[1]);
-    line(middlefingertip[0], middlefingertip[1] , pinkytip[0], pinkytip[1]);
-    line(thumbtip[0], thumbtip[1], palmbase[0], palmbase[1]);
-    line(pinkytip[0], pinkytip[1], palmbase[0], palmbase[1]);
-    
     push();
     fill(0, 255, 0);
     noStroke();
