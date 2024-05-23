@@ -2,7 +2,7 @@ let sprites;
 let nextSpawnDistance;
 let minDistanceBetweenSprites;
 let video;
-let predictions = [];
+let predictions;
 let bound = [];
 
 function setup() {
@@ -17,7 +17,11 @@ function setup() {
   video.hide();
 
   handpose.on("predict", results => {
-    predictions = results;
+    if (results && results.length > 0) {
+      predictions = results[0];
+    } else {
+      predictions = null;
+    }
   });
   
 }
@@ -33,7 +37,10 @@ function draw() {
   // right will be negative and left will be negative.
   background(220);
   // draw hand
-  bound = drawKeypoints(predictions);
+  if (predictions) {
+    bound = drawKeypoints(predictions);
+  }
+  
   pop();
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
@@ -43,14 +50,11 @@ function draw() {
     // print(nextSpawnDistance);
   }
 
-
-
-  
   // loop through all the sprites and update them
    for(let i = 0; i < sprites.length; i++){
     // check if sprite is in hand
     // sprite will turn red if selected
-    let selected = point_in_polygon({x: sprites[i].x, y: sprites[i].y}, bound);
+    let selected = in_poly({x: sprites[i].x, y: sprites[i].y}, bound);
     sprites[i].draw(selected);
     if (selected) {
       sprites[i].displayInfo();
