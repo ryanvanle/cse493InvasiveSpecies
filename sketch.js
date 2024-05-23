@@ -14,10 +14,12 @@ let bound = [];
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
-  invasiveImages = [loadImage('img/brown_marmorated_stinkbug.jpg'), 
-                    loadImage('img/american_bullfrog.png'),
-                    loadImage('img/garlic_mustard.jpg')];
-  nativeImages = [];
+  invasiveImages = [loadImage('img/invasive/brown_marmorated_stinkbug.jpg'), 
+                    loadImage('img/invasive/american_bullfrog.png'),
+                    loadImage('img/invasive/garlic_mustard.jpg')];
+  nativeImages = [loadImage('img/native/american_pika.jpg'), 
+                    loadImage('img/native/olympic_marmot.jpg'),
+                    loadImage('img/native/canada_geese.jpg')];
 }
 
 function setup() {
@@ -76,11 +78,23 @@ function draw() {
 
     // Only draw on screen sprites
     if(!sprites[i].offScreen) {
+
+      // INVASIVE
       if(sprites[i].isInvasive){
-        print(invasiveImages);
+        // print(invasiveImages);
+        // print("Type index: ");
+        // print(sprites[i].typeIndex);
         sprites[i].draw(invasiveImages[sprites[i].typeIndex]);
       } else {
-        sprites[i].draw(null);
+
+        // NATIVE
+        // console.log(sprites[i].typeIndex);
+        // print(nativeImages);
+        // print("Type index: ");
+        // print(sprites[i].typeIndex);
+        sprites[i].draw(nativeImages[sprites[i].typeIndex]);
+        // print(sprites[i].typeIndex);
+        // sprites[i].draw(null);
       }
     }
     if (selected) {
@@ -96,9 +110,8 @@ function draw() {
 
 function resetGame(){
   score = 0;
-  sprites = [new Sprite()];
+  sprites = [getNewSprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
-  print(nextSpawnDistance);
 }
 
 // generate a new sprite

@@ -1,11 +1,11 @@
-const spriteHeight = 25;
-const spriteWidth = 45;
+const spriteHeight = 35;
+const spriteWidth = 35;
 const invasiveLikelihood = 0.4;
 const speciesDescriptions = ['stinkbug', 'bullfrog', 'mustard'];
 
 // Sprite class that holds info for each sprite
 class Sprite {
-  constructor(index) {
+  constructor(typeIndex) {
     this.x = 0; // start on left
     // Random place throughout screen
     this.y = random(0 + spriteHeight, height-spriteHeight); // TODO: check this correct range
@@ -14,7 +14,7 @@ class Sprite {
     this.speed = 1;
     this.isInvasive = random(0, 1) < 0.4; // 40% chance of being invasive
     // const descrIndex = floor(random(0, speciesDescriptions.length));
-    this.typeIndex = index
+    this.typeIndex = typeIndex;
     if(this.isInvasive) {
       this.description = speciesDescriptions[this.typeIndex];
 
@@ -40,12 +40,14 @@ class Sprite {
     this.x += this.speed; 
   }
 
+  // Param: takes preloaded image defined by index of sprite
   draw(speciesImage){
     fill(0);
     if(speciesImage) {
-      // Draw invasive sprite
+      // Draw species sprite
       image(speciesImage, this.x,this.y,spriteWidth,spriteHeight);
     } else {
+      print('Sprite image was not defined');
       rect(this.x, this.y, spriteWidth, spriteHeight);
     }
   }
