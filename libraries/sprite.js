@@ -70,12 +70,14 @@ class Sprite {
     let description = this.description == null ?
                       "friendly" : this.description;
     push();
+    rectMode(CENTER)
     fill(0,0,255);
     stroke(155);
-    rect(this.x, this.y, 60, 80);
+    rect(this.x, this.y, spriteWidth + 10, spriteHeight + 10);
     textSize(12);
     fill(255,255,255);
-    text(description, this.x + 5, this.y + 10);
+    textAlign(CENTER);
+    text(description, this.x, this.y );
     pop();
   }
 
