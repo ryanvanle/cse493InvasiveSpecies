@@ -16,6 +16,8 @@ let net;
 
 let hasSetup = false;
 
+let netScore = 0;
+
 const DEFAULT_NET_SIZE = 75;
 
 net = {
@@ -24,6 +26,13 @@ net = {
   xSpeed: 0,
   ySpeed: 0,
   diameter: DEFAULT_NET_SIZE,
+}
+
+previousNetControllerData = {
+  x: 0,
+  y: 0,
+  z: 0,
+  pressed: false,
 }
 
 netControllerData = {
@@ -182,6 +191,7 @@ ws.onmessage = (event) => {
   let data = event.data.split(",");
   let isPressed = data[3] === "true";
 
+  previousNetControllerData = netControllerData;
 
   netControllerData = {
     x: Number(data[0]),
@@ -203,7 +213,7 @@ function netUpdate() {
   // if (!hasSetup) return;
 
   let isPressed = netControllerData.pressed;
-  let isCatching = isPressed && netControllerData.z <= -6; // -9 is fully flat / parallel to ground
+  let isCatching = isSwingingChecker() && isPressed;
 
   if (isCatching) {
     lockNetPosition();
@@ -218,21 +228,23 @@ function netUpdate() {
 
 function drawNetCursor() {
   push();
-  strokeWeight(4)
+  strokeWeight(4);
+
+  let strokeColor = netControllerData.pressed ? "red" : "black"
+  stroke(strokeColor);
+
   noFill();
   circle(net.x, net.y, net.diameter);
   pop();
 }
 
 function lockNetPosition() {
-  stroke("red");
   net.xSpeed = 0;
   net.ySpeed = 0;
 }
 
 
 function netSpeciesHoverChecker(specie) {
-
   if (specie.offScreen) return;
 
   let netRadius = net.diameter/2;
@@ -240,20 +252,32 @@ function netSpeciesHoverChecker(specie) {
   let netXEdgeRight = net.x + netRadius;
   let netYEdgeBottom = net.y - netRadius;
   let netYEdgeTop = net.y + netRadius;
-
-
-
   let isOutOfBoundsX = specie.x < netXEdgeLeft || specie.x > netXEdgeRight;
   let isOutOfBoundsY = specie.y < netYEdgeBottom || specie.y > netYEdgeTop;
-
-
   let isInBoundsNet = !(isOutOfBoundsX || isOutOfBoundsY);
 
   return isInBoundsNet;
 }
 
+function isSwingingChecker() {
+
+  let previousZ = previousNetControllerData.z;
+  let currentZ = netControllerData.z;
+
+  if (previousZ < currentZ) return false;
+  if (previousZ <= 0) return false; // is in currentSwing range;
+
+
+  let threshold = 10;
+  const difference = Math.abs(previousZ - currentZ);
+  const isValidSwing = difference >= threshold;
+  return isValidSwing;
+
+}
+
+
 function updateNetPosition() {
-  stroke("black");
+
 
   net.xSpeed = -netControllerData.y;
   net.ySpeed = -netControllerData.z;
@@ -275,6 +299,19 @@ function isInNetBoundsChecker() {
 }
 
 function updateCapture() {
+
+  for (let specie of sprites) {
+    if (specie.offScreen) continue;
+    if (!specie.isHighlighted) continue;
+
+    specie.offScreen = true;
+
+    if (specie.isInvasive) {
+      netScore++;
+    } else {
+      netScore--;
+    }
+  }
 
 }
 
