@@ -1,3 +1,8 @@
+const WIDTH = 640.0;
+const HEIGHT = 480.0;
+const CANVAS_WIDTH = 1280;
+const CANVAS_HEIGHT = 720;
+
 function modelReady() {
   console.log("Model ready!");
 }
@@ -6,10 +11,16 @@ function modelReady() {
 // A function to draw ellipses over the detected keypoints
 function drawKeypoints(prediction) {
   let vertices = [];
-  const thumbtip = prediction.annotations.thumb[3];
-  const pinkytip = prediction.annotations.pinky[3];
-  const middlefingertip = prediction.annotations.middleFinger[3];
-  const palmbase = prediction.annotations.palmBase[0];
+  let thumbtip = prediction.annotations.thumb[3];
+  let pinkytip = prediction.annotations.pinky[3];
+  let middlefingertip = prediction.annotations.middleFinger[3];
+  let palmbase = prediction.annotations.palmBase[0];
+
+  // translate coordinates
+  thumbtip = translate_coordinate(thumbtip[0], thumbtip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  pinkytip = translate_coordinate(pinkytip[0], pinkytip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  middlefingertip = translate_coordinate(middlefingertip[0], middlefingertip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  palmbase = translate_coordinate(palmbase[0], palmbase[1], CANVAS_WIDTH, CANVAS_HEIGHT);
   
   // hand is translated by amount width and scaled by -1 in x axis
   vertices.push({x: width - thumbtip[0], y: thumbtip[1]});
@@ -21,7 +32,8 @@ function drawKeypoints(prediction) {
     push();
     fill(0, 255, 0);
     noStroke();
-    ellipse(keypoint[0], keypoint[1], 10, 10);
+    let point = translate_coordinate(keypoint[0], keypoint[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+    ellipse(point[0], point[1], 10, 10);
     pop();
   }
 
@@ -43,4 +55,17 @@ function in_poly(point, polygon) {
     if (intersect) inside = !inside;
   }
   return inside;
+}
+
+// scale the ml5 output to actual canvas size
+// parameters : 
+// x, y : input coordinate
+// w, h : width and height of canvas
+// Output
+// res : array containing output x and y
+function translate_coordinate(x, y, w, h) {
+  let res = [];
+  res[0] = x / WIDTH * w;
+  res[1] = y / HEIGHT * h;
+  return res;
 }
