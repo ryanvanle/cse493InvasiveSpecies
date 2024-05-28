@@ -37,6 +37,7 @@ function drawKeypoints(prediction) {
     pop();
   }
 
+
   return vertices;
 }
 

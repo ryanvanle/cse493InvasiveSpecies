@@ -11,10 +11,11 @@ class Sprite {
     this.y = random(0 + spriteHeight, height-spriteHeight); // TODO: check this correct range
     this.width = spriteWidth;
     this.height = spriteHeight;
-    this.speed = 1;
+    this.speed = 3;
     this.isInvasive = random(0, 1) < 0.4; // 40% chance of being invasive
     // const descrIndex = floor(random(0, speciesDescriptions.length));
     this.typeIndex = typeIndex;
+    this.spriteMillis = millis();
 
     this.isHighlighted = false;
 
@@ -40,7 +41,10 @@ class Sprite {
 
   update(){
     // sprites move from left to right
-    this.x += this.speed;
+    if (millis() - this.spriteMillis > 20) {
+      this.x += this.speed;
+      this.spriteMillis = millis();
+    }
   }
 
   // Param: takes preloaded image defined by index of sprite

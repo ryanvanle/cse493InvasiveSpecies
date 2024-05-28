@@ -5,6 +5,7 @@ let nextSpawnDistance;
 let minDistanceBetweenSprites;
 let invasiveImages;
 let nativeImages;
+let spriteMillis = 0;
 
 // handpose globals
 let video;
@@ -62,6 +63,7 @@ function preload() {
 
 function setup() {
   createCanvas(1280, 720);
+  spriteMillis = millis();
   video = createCapture(VIDEO);
   video.size(width, height);
 
@@ -74,21 +76,19 @@ function setup() {
   handpose.on("predict", results => {
     if (results && results.length > 0) {
       predictions = results[0];
+      console.log("hand detected");
     } else {
       predictions = null;
     }
   });
-
 
 }
 
 function draw() {
   // Mirror video
   // hasSetup = true;
+  
   netUpdate();
-
-
-
   push();
   translate(width,0);
   scale(-1.0,1.0);
@@ -96,6 +96,8 @@ function draw() {
   // draw hand
   if (predictions) {
     bound = drawKeypoints(predictions);
+  } else {
+    bound = null;
   }
   pop();
 
@@ -110,8 +112,10 @@ function draw() {
   // loop through all the sprites and update them
   for(let i = 0; i < sprites.length; i++){
     // check if sprite is in hand
-    // sprite will turn red if selected
-    let selected = in_poly({x: sprites[i].x, y: sprites[i].y}, bound);
+    let selected = false;
+    if (bound) {
+      selected = in_poly({x: sprites[i].x, y: sprites[i].y}, bound);
+    }
 
     sprites[i].update();
 
@@ -163,6 +167,8 @@ function draw() {
   }
 
   drawNetCursor();
+
+  text(frameRate(), 20, 20);
 }
 
 function resetGame(){
