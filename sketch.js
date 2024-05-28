@@ -49,7 +49,7 @@ netControllerData = {
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
-  invasiveImages = [loadImage('img/invasive/brown_marmorated_stinkbug.jpg'),
+  invasiveImages = [loadImage('img/invasive/brown_marmorated_stinkbug.png'),
                     loadImage('img/invasive/american_bullfrog.png'),
                     loadImage('img/invasive/garlic_mustard.jpg')];
   nativeImages = [loadImage('img/native/american_pika.jpg'),

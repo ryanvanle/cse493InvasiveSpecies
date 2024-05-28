@@ -1,18 +1,19 @@
-const spriteHeight = 35;
-const spriteWidth = 35;
+const spriteHeight = 45;
+const spriteWidth = 45;
 const invasiveLikelihood = 0.4;
 const speciesDescriptions = ['stinkbug', 'bullfrog', 'mustard'];
+// const infoBoxHeight = 200;
 
 // Sprite class that holds info for each sprite
 class Sprite {
   constructor(typeIndex) {
     this.x = 0; // start on left
     // Random place throughout screen
-    this.y = random(0 + spriteHeight, height-spriteHeight); // TODO: check this correct range
+    this.y = random(0 + spriteHeight, 720 -(spriteHeight*2)); // 720 is canvas height
     this.width = spriteWidth;
     this.height = spriteHeight;
-    this.speed = 3;
-    this.isInvasive = random(0, 1) < 0.4; // 40% chance of being invasive
+    this.speed = 5;
+    this.isInvasive = random(0, 1) < invasiveLikelihood; // 40% chance of being invasive
     // const descrIndex = floor(random(0, speciesDescriptions.length));
     this.typeIndex = typeIndex;
     this.spriteMillis = millis();
