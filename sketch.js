@@ -168,7 +168,8 @@ function draw() {
 
   drawNetCursor();
 
-  text(frameRate(), 20, 20);
+  // frame rate count. uncomment when debugging
+  //text(frameRate(), 20, 20);
 }
 
 function resetGame(){
