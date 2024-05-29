@@ -10,7 +10,7 @@ let spriteMillis = 0;
 // handpose globals
 let video;
 let predictions;
-let bound = [];
+let bound = null;
 
 let netControllerData;
 let net;
@@ -74,12 +74,16 @@ function setup() {
   video.hide();
 
   handpose.on("predict", results => {
-    if (results && results.length > 0) {
-      predictions = results[0];
-      console.log("hand detected");
-    } else {
-      predictions = null;
+    predictions = results[0];
+    push();
+    translate(width,0);
+    scale(-1.0,1.0);
+    // draw hand
+    if (predictions) {
+      bound = draw_viewfinder(predictions);
     }
+    pop();
+
   });
 
 }
@@ -88,18 +92,9 @@ function draw() {
   // Mirror video
   // hasSetup = true;
   
-  netUpdate();
-  push();
-  translate(width,0);
-  scale(-1.0,1.0);
+  //netUpdate();
   background(backgroundImage);
-  // draw hand
-  if (predictions) {
-    bound = draw_viewfinder(predictions);
-  } else {
-    bound = null;
-  }
-  pop();
+  
 
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
@@ -124,10 +119,6 @@ function draw() {
       sprites[i].offScreen = true;
 
       if (sprites.isInvasive) updateScore(false);
-
-
-      // Don't delete here because will glitch next sprite
-      // Just set to not show
     }
 
     // Only draw on screen sprites
@@ -152,6 +143,10 @@ function draw() {
       }
     }
     if (selected) {
+      if (predictions && is_closed(predictions)) {
+        let info = document.getElementById("species-info");
+        info.innerHTML = sprites[i].description;
+      }
       sprites[i].displayInfo();
     }
 
@@ -168,10 +163,6 @@ function draw() {
 
   // frame rate count. uncomment when debugging
   text(frameRate(), 20, 20);
-  if (predictions) {
-    text(is_closed(predictions), 20, 30)
-  }
-  
 }
 
 function resetGame(){

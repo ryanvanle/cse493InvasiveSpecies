@@ -42,7 +42,7 @@ class Sprite {
 
   update(){
     // sprites move from left to right
-    if (millis() - this.spriteMillis > 20) {
+    if (millis() - this.spriteMillis > 30) {
       this.x += this.speed;
       this.spriteMillis = millis();
     }
