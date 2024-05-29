@@ -70,3 +70,21 @@ function translate_coordinate(x, y, w, h) {
   res[1] = y / HEIGHT * h;
   return res;
 }
+
+function is_closed(prediction) {
+  let thumbtip = prediction.annotations.thumb[3];
+  let pinkytip = prediction.annotations.pinky[3];
+  let middlefingertip = prediction.annotations.middleFinger[3];
+  let palmbase = prediction.annotations.palmBase[0];
+  thumbtip = translate_coordinate(thumbtip[0], thumbtip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  pinkytip = translate_coordinate(pinkytip[0], pinkytip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  middlefingertip = translate_coordinate(middlefingertip[0], middlefingertip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  palmbase = translate_coordinate(palmbase[0], palmbase[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  let observed_points = [thumbtip, pinkytip, middlefingertip];
+  let distances = 0;
+  for (let i = 0; i < observed_points.length; i++) {
+    const point = observed_points[i];
+    distances += abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]);
+  }
+  return distances / observed_points.length;
+}

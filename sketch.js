@@ -170,6 +170,9 @@ function draw() {
 
   // frame rate count. uncomment when debugging
   //text(frameRate(), 20, 20);
+  if (predictions) {
+    text(is_closed(predictions), 20, 20)
+  }
 }
 
 function resetGame(){
@@ -327,7 +330,6 @@ function updateCapture() {
 
 
 function updateScore(didGain) {
-
   if (didGain) {
     netScore += 1;
   } else {
