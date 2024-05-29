@@ -41,6 +41,38 @@ function drawKeypoints(prediction) {
   return vertices;
 }
 
+// draw viewfinder on hand location
+function draw_viewfinder(prediction) {
+  let palmbase = prediction.annotations.palmBase[0];
+  palmbase = translate_coordinate(palmbase[0], palmbase[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  push();
+  noFill();
+  stroke(125);
+  let w = 200;
+  let h = 100;
+  let diameter = 40
+  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
+  circle(palmbase[0], palmbase[1] - h/2, diameter);
+  line(palmbase[0] - diameter/2, palmbase[1] - h/2, palmbase[0] + diameter/2, palmbase[1] - h/2);
+  pop();
+  return [width - w -(palmbase[0] - w / 2), palmbase[1], w, h];
+}
+
+// x1, y1 is the object and x2, y2 is the bounds
+function in_rect(point, bound) {
+  x1 = point.x;
+  y1 = point.y;
+  x2 = bound[0];
+  y2 = bound[1];
+  w = bound[2];
+  h = bound[3];
+  if ((x1 < x2) || (y1 > y2) || (x1 > x2 + w) || (y1 < y2 - h)) {
+    return false;
+  }
+  return true;
+}
+
 // code credit : https://observablehq.com/@tmcw/understanding-point-in-polygon
 function in_poly(point, polygon) {
   let x = point.x;
@@ -76,15 +108,22 @@ function is_closed(prediction) {
   let pinkytip = prediction.annotations.pinky[3];
   let middlefingertip = prediction.annotations.middleFinger[3];
   let palmbase = prediction.annotations.palmBase[0];
+  let palmbase_2 = prediction.annotations.middleFinger[0];
+  palmbase_2 = translate_coordinate(palmbase_2[0], palmbase_2[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+
   thumbtip = translate_coordinate(thumbtip[0], thumbtip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
   pinkytip = translate_coordinate(pinkytip[0], pinkytip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
   middlefingertip = translate_coordinate(middlefingertip[0], middlefingertip[1], CANVAS_WIDTH, CANVAS_HEIGHT);
   palmbase = translate_coordinate(palmbase[0], palmbase[1], CANVAS_WIDTH, CANVAS_HEIGHT);
+  let depth = abs(palmbase[0] - palmbase_2[0]) + abs(palmbase[1] - palmbase_2[1]) * 10;
+
   let observed_points = [thumbtip, pinkytip, middlefingertip];
   let distances = 0;
   for (let i = 0; i < observed_points.length; i++) {
     const point = observed_points[i];
-    distances += abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]);
+    distances += abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]) / depth;
   }
-  return distances / observed_points.length;
+  // palm closes at value < 30
+  let value = distances / observed_points.length;
+  return (value < 35);
 }

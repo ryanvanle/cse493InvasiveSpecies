@@ -95,7 +95,7 @@ function draw() {
   background(backgroundImage);
   // draw hand
   if (predictions) {
-    bound = drawKeypoints(predictions);
+    bound = draw_viewfinder(predictions);
   } else {
     bound = null;
   }
@@ -114,7 +114,7 @@ function draw() {
     // check if sprite is in hand
     let selected = false;
     if (bound) {
-      selected = in_poly({x: sprites[i].x, y: sprites[i].y}, bound);
+      selected = in_rect({x: sprites[i].x, y: sprites[i].y}, bound);
     }
 
     sprites[i].update();
@@ -155,8 +155,6 @@ function draw() {
       sprites[i].displayInfo();
     }
 
-
-
     let isNetHovering = netSpeciesHoverChecker(sprites[i]);
     sprites[i].displayNetInfo(isNetHovering);
   }
@@ -169,10 +167,11 @@ function draw() {
   drawNetCursor();
 
   // frame rate count. uncomment when debugging
-  //text(frameRate(), 20, 20);
+  text(frameRate(), 20, 20);
   if (predictions) {
-    text(is_closed(predictions), 20, 20)
+    text(is_closed(predictions), 20, 30)
   }
+  
 }
 
 function resetGame(){
