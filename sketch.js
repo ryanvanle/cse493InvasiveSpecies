@@ -11,6 +11,8 @@ let spriteMillis = 0;
 let video;
 let predictions;
 let bound = null;
+let prediction_interval = 100;
+let last_prediction= 0;
 
 let netControllerData;
 let net;
@@ -62,7 +64,7 @@ function preload() {
 
 
 function setup() {
-  createCanvas(1280, 720);
+  createCanvas(window.innerWidth, window.innerWidth * 9 / 16);
   spriteMillis = millis();
   video = createCapture(VIDEO);
   video.size(width, height);
@@ -83,7 +85,6 @@ function setup() {
       bound = draw_viewfinder(predictions);
     }
     pop();
-
   });
 
 }
@@ -92,7 +93,7 @@ function draw() {
   // Mirror video
   // hasSetup = true;
   
-  //netUpdate();
+  netUpdate();
   background(backgroundImage);
   
 

@@ -1,7 +1,7 @@
 const WIDTH = 640.0;
 const HEIGHT = 480.0;
-const CANVAS_WIDTH = 1280;
-const CANVAS_HEIGHT = 720;
+const CANVAS_WIDTH = window.innerWidth;
+const CANVAS_HEIGHT = window.innerWidth * 9 / 16;
 
 function modelReady() {
   console.log("Model ready!");
