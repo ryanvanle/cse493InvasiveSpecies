@@ -16,10 +16,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
-    <div class="absolute bottom-4">
-      <p>score: <span id="score">0</span></p>
-      <div id="species-info">message</div>
+   <div class="absolute w-full flex items-center justify-center bottom-8">
+     <div class="absolute bottom-4 bg-black/25 backdrop-blur-3xl border-white/25 border rounded-2xl p-4 shadow-3xl w-full max-w-lg mx-auto">
+     <div class="grid grid-cols-2 gap-4">
+       <div class="space-y-2">
+        <p class="uppercase font-semibold tracking-widest text-sm">Score</p>
+        <h2 class="font-mono text-3xl" id="score">0</h2>
+      </div>
+      <div class="space-y-2">
+       <p class="uppercase font-semibold tracking-widest text-sm">Info</p>
+        <h2 class="text-2xl" id="species-info">0</h2>
+      </div>
+     </div>
     </div>
+   </div>
     <script src="sketch.js"></script>
     <script src="net.js" type="module"></script>
   </body>
