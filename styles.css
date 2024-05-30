@@ -39,6 +39,10 @@ body {
   height: 100%;
 }
 
+.font-display {
+  font-family: "Jersey 25", sans-serif;
+}
+
 main {
   height: 100% !important;
   display: flex;

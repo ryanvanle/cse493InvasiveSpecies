@@ -14,23 +14,78 @@
     <script src="libraries/hand.js"></script>
     <script src="libraries/sprite.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jersey+25&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-   <div class="absolute w-full flex items-center justify-center bottom-8">
-     <div class="absolute bottom-4 bg-black/25 backdrop-blur-3xl border-white/25 border rounded-2xl p-4 shadow-3xl w-full max-w-lg mx-auto">
-     <div class="grid grid-cols-2 gap-4">
-       <div class="space-y-2">
-        <p class="uppercase font-semibold tracking-widest text-sm">Ecosystem Health</p>
-        <h2 class="font-mono text-3xl" id="score">0</h2>
+    <div
+      class="fixed w-full flex items-center space-x-16 justify-center top-4"
+      id="top-bar"
+    >
+      <div
+        class="bg-black/25 backdrop-blur-lg w-full max-w-3xl border-white/25 border rounded-2xl px-8 py-4 shadow-3xl text-center"
+      >
+        <p
+          class="uppercase font-semibold tracking-widest text-xl italic font-display"
+          id="species-identifier"
+        >
+          No species selected
+        </p>
+        <div class="text-left flex items-start justify-start space-x-4">
+          <img
+            src=""
+            class="w-20 h-20 shrink-0 rounded-lg overflow-hidden object-cover border-white/25 border shadow-3xl"
+            style="display: none"
+            id="species-image"
+          />
+          <div>
+            <h2 id="species-name" class="font-semibold text-2xl"></h2>
+            <p id="species-info"></p>
+          </div>
+        </div>
       </div>
-      <div class="space-y-2">
-       <p class="uppercase font-semibold tracking-widest text-sm">Info</p>
-        <h2 class="text-2xl" id="species-info">message</h2>
-      </div>
-      <div id="species-image">image goes here</div>
-     </div>
     </div>
-   </div>
+    <div
+      class="fixed w-full flex items-center space-x-16 justify-center bottom-4"
+      id="bottom-bar"
+    >
+      <div
+        class="bg-black/25 max-w-2xl w-full backdrop-blur-3xl border-white/25 border rounded-2xl px-4 py-4 shadow-3xl flex items-start justify-center gap-16"
+      >
+        <div class="space-y-2 text-left w-full">
+          <p
+            class="uppercase font-semibold tracking-widest text-xl italic font-display"
+          >
+            Ecosystem Health
+          </p>
+          <div>
+            <div
+              class="h-6 w-full bg-gray-800 rounded-md border-white/25 border overflow-hidden relative"
+            >
+              <div
+                id="health-bar"
+                style="
+                  background-color: #22c55e;
+                  width: 100%;
+                  height: 100%;
+                  transition: width 0.5s ease-in-out;
+                "
+              />
+              <p
+                class="inline-flex font-medium text-black absolute text-sm right-1 top-0.5"
+                id="ecohealth"
+              >
+                100%
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="sketch.js"></script>
     <script src="net.js" type="module"></script>
   </body>

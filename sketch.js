@@ -27,9 +27,11 @@ let isGameOver = false;
 let mainFont;
 const START_HEALTH = 10;
 let ecoHealth = START_HEALTH;
-const PTS = 10;
+const PTS = 1;
 
 let backgroundImage;
+
+const SHOW_TOP_BAR = true;
 
 net = {
   x: Number(300 / 2),
@@ -67,10 +69,10 @@ let screenEffects = {
     isActive: false,
     timeout: null,
     data: [],
-    init: function() {
+    init: function () {
       this.data = [];
     },
-    clear: function() {
+    clear: function () {
       clearTimeout(this.timeout);
       this.data = [];
     },
@@ -79,21 +81,21 @@ let screenEffects = {
   colorInvert: {
     isActive: false,
     timeout: null,
-    init: function() {},
-    clear: function() {
+    init: function () {},
+    clear: function () {
       clearTimeout(this.timeout);
     },
-    update: function() {
+    update: function () {
       filter(INVERT);
     },
   },
   leafFall: {
     isActive: false,
     timeout: null,
-    init: function() {
+    init: function () {
       fallingLeaves = []; // Clear previous leaves if any
     },
-    clear: function() {
+    clear: function () {
       clearTimeout(this.timeout);
       fallingLeaves = [];
       groundLeaves = [];
@@ -107,33 +109,36 @@ let screenEffects = {
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
-
-  invasiveImages = [loadImage('img/invasive/brown_marmorated_stinkbug.png'),
-                    loadImage('img/invasive/american_bullfrog.png'),
-                    loadImage('img/invasive/garlic_mustard.jpg')];
-  nativeImages = [loadImage('img/native/american_pika.jpg'),
-                    loadImage('img/native/olympic_marmot.jpg'),
-                    loadImage('img/native/canada_geese.jpg')];
+  invasiveImages = [
+    loadImage("img/invasive/brown_marmorated_stinkbug.png"),
+    loadImage("img/invasive/american_bullfrog.png"),
+    loadImage("img/invasive/garlic_mustard.jpg"),
+  ];
+  nativeImages = [
+    loadImage("img/native/american_pika.jpg"),
+    loadImage("img/native/olympic_marmot.jpg"),
+    loadImage("img/native/canada_geese.jpg"),
+  ];
 
   invasiveImagesSource = [
-    'img/invasive/brown_marmorated_stinkbug.png',
-    'img/invasive/american_bullfrog.png',
-    'img/invasive/garlic_mustard.jpg'
-  ]
+    "img/invasive/brown_marmorated_stinkbug.png",
+    "img/invasive/american_bullfrog.png",
+    "img/invasive/garlic_mustard.jpg",
+  ];
   nativeImagesSource = [
-    'img/native/american_pika.jpg',
-    'img/native/olympic_marmot.jpg',
-    'img/native/canada_geese.jpg'
-  ] 
+    "img/native/american_pika.jpg",
+    "img/native/olympic_marmot.jpg",
+    "img/native/canada_geese.jpg",
+  ];
 
-  backgroundImage = loadImage('img/grass.jpeg');
+  backgroundImage = loadImage("img/grass.jpeg");
   // Image Attribution: Image by brgfx on Freepik
-  backgroundImage = loadImage('img/rocky_cliff.jpg');
+  backgroundImage = loadImage("img/rocky_cliff.jpg");
   // backgroundImage = loadImage('img/grass.jpeg');
-  
+
   cameraSound = loadSound("audio/camera.mp3");
   // mainFont = loadFont('assets/Organo.ttf');
-  mainFont = loadFont('assets/comic.TTF');
+  mainFont = loadFont("assets/comic.TTF");
 }
 
 function setup() {
@@ -150,7 +155,6 @@ function setup() {
   video = createCapture(VIDEO);
   video.size(width, height);
   textFont(mainFont);
-
 
   soundFormats("mp3");
 
@@ -174,18 +178,26 @@ function setup() {
   });
 }
 
+function hideTopBar() {
+  if (!SHOW_TOP_BAR) {
+    let topBar = id("top-bar");
+    topBar.style.display = "none";
+  }
+}
+
 function draw() {
+  hideTopBar();
+
   if (!model_ready) {
     menu();
   } else if (!hand_raised) {
-    if(isGameOver) {
+    if (isGameOver) {
       // Start over screen
       gameOver();
     } else {
       raise_hand(); // Raise hand to trigger game
     }
-  }
-  else {
+  } else {
     // Game in action
     gameplay_loop();
   }
@@ -204,11 +216,11 @@ function raise_hand() {
   background(backgroundImage);
   push();
   textSize(100);
-  let s = "Space Invaders"
-  text(s, (width - textWidth(s)) / 2, height/3);
+  let s = "Space Invaders";
+  text(s, (width - textWidth(s)) / 2, height / 3);
   textSize(50);
   s = "raise hand to start playing";
-  text(s, (width - textWidth(s)) / 2, height/2);
+  text(s, (width - textWidth(s)) / 2, height / 2);
   pop();
 }
 
@@ -250,7 +262,7 @@ function gameplay_loop() {
       sprites[i].offScreen = true;
 
       // If failed to capture,
-      if (sprites[i].isInvasive){
+      if (sprites[i].isInvasive) {
         updateScore(false);
         console.log("Failed to capture invasive");
       }
@@ -275,6 +287,11 @@ function gameplay_loop() {
         // sprites[i].draw(null);
       }
     }
+    const speciesIdentifier = id("species-identifier");
+    const imgElement = id("species-image");
+    const info = id("species-info");
+    const name = id("species-name");
+
     if (selected) {
       if (
         predictions &&
@@ -283,26 +300,25 @@ function gameplay_loop() {
       ) {
         cameraSound.play();
         push();
-        translate(width,0);
-        scale(-1.0,1.0);
+        translate(width, 0);
+        scale(-1.0, 1.0);
         draw_viewfinder(predictions, true);
         pop();
-        const info = document.getElementById("species-info");
-        const name = document.getElementById("species-name");
-        const image = document.getElementById("species-image")
+
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
-        console.log(invasiveImages[sprites[i].typeIndex]);
-        const imgElement = document.createElement("img");
-        imgElement.setAttribute("width", "100");
-        imgElement.setAttribute("height", "100");
-        image.innerHTML = "";
+
         if (sprites[i].isInvasive) {
           imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
+          imgElement.style.display = "block";
+          speciesIdentifier.innerHTML = "Invasive ❌";
         } else {
+          console.log("Native!!!!");
           imgElement.src = nativeImagesSource[sprites[i].typeIndex];
+          imgElement.style.display = "block";
+          speciesIdentifier.innerHTML = "Native ✅";
         }
-        image.appendChild(imgElement);
+
         capture_millis = millis();
       }
       sprites[i].displayInfo();
@@ -324,23 +340,20 @@ function gameplay_loop() {
   // text(frameRate(), 20, 20);
   text(frameRate(), 20, 20);
 
-
   drawScreenEffects();
 }
 
-
 function keyPressed() {
-  if (key === 'e') {
+  if (key === "e") {
     activateRandomScreenEffect(5000);
   }
 }
 
-
-function resetGame(){
+function resetGame() {
   // netScore = 0;
   ecoHealth = START_HEALTH;
   sprites = [getNewSprite()];
-  nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
+  nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
 }
 
@@ -348,19 +361,21 @@ function resetGame(){
 function gameOver() {
   // Clear the screen
   background(backgroundImage);
+  updateHealthBar(0);
   // Ask user to try again
   push();
   textSize(100);
   let message = "game over!";
   textSize(50);
-  text(message, (width - textWidth(message)) / 2, height/3);
+  text(message, (width - textWidth(message)) / 2, height / 3);
   message = "raise hand to try again";
-  text(message, (width - textWidth(message)) / 2, height/2);
+  text(message, (width - textWidth(message)) / 2, height / 2);
   pop();
 
   // Watch for hand raise again
-  if(hand_raised) {
+  if (hand_raised) {
     isGameOver = false;
+    updateHealthBar(1);
   }
 }
 
@@ -498,7 +513,6 @@ function updateCapture() {
   }
 }
 
-
 // When an animal is captured, updates score according to
 // its identity (native vs invasive)
 function updateScore(capturedInvasive) {
@@ -522,17 +536,41 @@ function updateScore(capturedInvasive) {
 }
 
 function displayScore() {
-  // id("score").textContent = ecoHealth;
-  push();
-  fill(0); // black text
-  textAlign(LEFT);
-  textSize(20);
-  let message = "Ecosystem Health: ";
-  message += str(ecoHealth);
-  text(message, 50 , 50);
-  pop();
+  let currHealth = ecoHealth / START_HEALTH;
+  updateHealthBar(currHealth);
 }
 
+function updateHealthBar(percentage) {
+  let healthBarColors = [
+    "#dc2626",
+    "#f97316",
+    "#f59e0b",
+    "#facc15",
+    "#84cc16",
+    "#22c55e",
+  ];
+
+  let healthBarColor =
+    healthBarColors[floor(percentage * healthBarColors.length)];
+
+  const healthBar = id("health-bar");
+  healthBar.style.width = percentage * 100 + "%";
+  healthBar.style.backgroundColor = healthBarColor;
+
+  const ecoHealthText = id("ecohealth");
+  ecoHealthText.innerHTML = percentage * 100 + "%";
+
+  if (percentage <= 0.9) {
+    ecoHealthText.style.color = "white";
+  } else {
+    ecoHealthText.style.color = "black";
+  }
+
+  if (percentage == 1) {
+    healthBar.style.backgroundColor =
+      healthBarColors[healthBarColors.length - 1];
+  }
+}
 
 // google gemini advance generated code from initial base code
 function activateRandomScreenEffect(duration) {
@@ -546,7 +584,7 @@ function activateRandomScreenEffect(duration) {
 
   // Choose a random effect to activate
   const availableEffects = Object.keys(screenEffects).filter(
-    effectName => !screenEffects[effectName].isActive
+    (effectName) => !screenEffects[effectName].isActive
   );
   const randomEffectName = random(availableEffects);
   const randomEffect = screenEffects[randomEffectName];
@@ -560,14 +598,12 @@ function activateRandomScreenEffect(duration) {
   }, duration);
 }
 
-
 function clearEffect() {
   clearTimeout(screenEffectTimeout);
   screenEffectArray = [];
 }
 
 function blooperEffect() {
-
   if (screenEffects.blooper.data.length === 0) {
     let amount = getRandomInt(30, 50);
 
@@ -585,7 +621,7 @@ function blooperEffect() {
       };
 
       for (let j = 0; j < 10; j++) {
-        let angle = radians(j * 360 / 10);
+        let angle = radians((j * 360) / 10);
         let offset = splat.radius * getRandomArbitrary(0.3, 0.8);
         let jitterX = getRandomArbitrary(-offset * 0.3, offset * 0.3);
         let jitterY = getRandomArbitrary(-offset * 0.3, offset * 0.3);
@@ -617,13 +653,18 @@ function blooperEffect() {
       // Apply individual growth to each point
       for (let j = 0; j < splat.points.length; j++) {
         let point = splat.points[j];
-        point.x = point.originalX + splat.growthFactor * (point.originalX - splat.x);
-        point.y = point.originalY + splat.growthFactor * (point.originalY - splat.y);
+        point.x =
+          point.originalX + splat.growthFactor * (point.originalX - splat.x);
+        point.y =
+          point.originalY + splat.growthFactor * (point.originalY - splat.y);
       }
 
       // Draw the splat with curveVertex() for smoother edges
       beginShape();
-      curveVertex(splat.points[splat.points.length - 1].x, splat.points[splat.points.length - 1].y);
+      curveVertex(
+        splat.points[splat.points.length - 1].x,
+        splat.points[splat.points.length - 1].y
+      );
       for (let point of splat.points) {
         curveVertex(point.x, point.y);
       }
@@ -651,8 +692,6 @@ function blooperEffect() {
 
   pop();
 }
-
-
 
 function leafFallEffect() {
   if (frameCount % 5 == 0) {
@@ -693,10 +732,10 @@ function leafFallEffect() {
     translate(leaf.x, leaf.y);
     rotate(radians(leaf.rotation));
     beginShape();
-    vertex(0, -leaf.size / 2 * leaf.shapeVariation);
-    vertex(-leaf.size / 4 * leaf.shapeVariation, 0);
-    vertex(0, leaf.size / 2 * leaf.shapeVariation);
-    vertex(leaf.size / 4 * leaf.shapeVariation, 0);
+    vertex(0, (-leaf.size / 2) * leaf.shapeVariation);
+    vertex((-leaf.size / 4) * leaf.shapeVariation, 0);
+    vertex(0, (leaf.size / 2) * leaf.shapeVariation);
+    vertex((leaf.size / 4) * leaf.shapeVariation, 0);
     endShape(CLOSE);
     resetMatrix();
   }
@@ -708,18 +747,16 @@ function leafFallEffect() {
     translate(leaf.x, leaf.y);
     rotate(radians(leaf.rotation));
     beginShape();
-    vertex(0, -leaf.size / 2 * leaf.shapeVariation);
-    vertex(-leaf.size / 4 * leaf.shapeVariation, 0);
-    vertex(0, leaf.size / 2 * leaf.shapeVariation);
-    vertex(leaf.size / 4 * leaf.shapeVariation, 0);
+    vertex(0, (-leaf.size / 2) * leaf.shapeVariation);
+    vertex((-leaf.size / 4) * leaf.shapeVariation, 0);
+    vertex(0, (leaf.size / 2) * leaf.shapeVariation);
+    vertex((leaf.size / 4) * leaf.shapeVariation, 0);
     endShape(CLOSE);
     resetMatrix();
   }
 
   pop();
 }
-
-
 
 function drawScreenEffects() {
   for (let effectName in screenEffects) {
@@ -729,7 +766,6 @@ function drawScreenEffects() {
   }
 }
 
-
 /**
  * Returns a random number between min (inclusive) and max (exclusive)
  */
@@ -738,12 +774,12 @@ function getRandomArbitrary(min, max) {
 }
 
 /**
-* Returns a random integer between min (inclusive) and max (inclusive).
-* The value is no lower than min (or the next integer greater than min
-* if min isn't an integer) and no greater than max (or the next integer
-* lower than max if max isn't an integer).
-* Using Math.round() will give you a non-uniform distribution!
-*/
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
