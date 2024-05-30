@@ -69,9 +69,12 @@ function preload() {
                     loadImage('img/native/olympic_marmot.jpg'),
                     loadImage('img/native/canada_geese.jpg')];
 
-  backgroundImage = loadImage('img/grass.jpeg');
+  // Image Attribution: Image by brgfx on Freepik
+  backgroundImage = loadImage('img/rocky_cliff.jpg');
+  // backgroundImage = loadImage('img/grass.jpeg');
   cameraSound = loadSound("audio/camera.mp3");
-  mainFont = loadFont('assets/Organo.ttf');
+  // mainFont = loadFont('assets/Organo.ttf');
+  mainFont = loadFont('assets/comic.TTF');
 }
 
 
@@ -134,8 +137,11 @@ function menu() {
 function raise_hand() {
   background(backgroundImage);
   push();
+  textSize(100);
+  let s = "Space Invaders"
+  text(s, (width - textWidth(s)) / 2, height/3);
   textSize(50);
-  let s = "raise hand to start playing";
+  s = "raise hand to start playing";
   text(s, (width - textWidth(s)) / 2, height/2);
   pop();
 }
