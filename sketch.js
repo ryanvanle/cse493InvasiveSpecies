@@ -307,6 +307,9 @@ function gameplay_loop() {
 
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
+        let speciesType = sprites[i].isInvasive ? "invasive" : "native";
+
+        sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
 
         if (sprites[i].isInvasive) {
           imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
@@ -395,12 +398,13 @@ ws.onopen = () => {
   const sampleImageData = "base64EncodedImageData";
   const sampleDescription = "description";
   const sampleTitle = "hi! :D";
+  const sampleSpecies = "invasive"
 
-  sendDataToServer(sampleImageData, sampleDescription, sampleTitle);
+  sendDataToServer(sampleImageData, sampleDescription, sampleTitle, sampleSpecies);
 };
 
-function sendDataToServer(imageData, description, title) {
-  const dataToSend = JSON.stringify({ image: imageData, description, title });
+function sendDataToServer(imageData, description, title, speciesType) {
+  const dataToSend = JSON.stringify({ image: imageData, description, title, speciesType});
   ws.send(dataToSend);
 }
 
