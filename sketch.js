@@ -49,6 +49,36 @@ let screenEffectArray = [];
 let isScreenEffectActive = false;
 let screenEffectTimeout;
 
+// google gemini generated, essentially we're creating objects per effect, but not using the new JS class constructor
+let screenEffects = {
+  blooper: {
+    isActive: false,
+    timeout: null,
+    data: [],
+    init: function() {
+      this.data = [];
+    },
+    clear: function() {
+      clearTimeout(this.timeout);
+      this.data = [];
+    },
+    update: blooperEffect,
+  },
+  colorInvert: {
+    isActive: false,
+    timeout: null,
+    init: function() {},
+    clear: function() {
+      clearTimeout(this.timeout);
+    },
+    update: function() {
+      filter(INVERT);
+    },
+  },
+  // ... add more effects here (e.g., shake, pixelate, etc.)
+};
+
+
 
 // Must declare image array in preload to work
 // Invariant: # of invasive and non-invasive species must be the same.
@@ -172,16 +202,13 @@ function draw() {
   // frame rate count. uncomment when debugging
   text(frameRate(), 20, 20);
 
-  if (isScreenEffectActive) {
-    blooperEffect(); // Call blooperEffect to update and draw the splats
-  }
 
+  drawScreenEffects();
 }
 
-// Activate the effect on key press (e.g., spacebar)
 function keyPressed() {
-  if (key === 'e') {  // Change this to the desired key
-    activateRandomScreenEffect(5000); // 5-second duration
+  if (key === 'e') {
+    activateRandomScreenEffect(5000);
   }
 }
 
@@ -356,28 +383,42 @@ function displayScore() {
   id("score").textContent = netScore;
 }
 
+
+// google gemini generated code from initial base code
 function activateRandomScreenEffect(duration) {
-  if (!isScreenEffectActive) {
-    isScreenEffectActive = true;
-    screenEffectTimeout = setTimeout(() => {
-      isScreenEffectActive = false;
-      clearEffect();
-    }, duration);
+  // Deactivate any currently active effect
+  for (let effectName in screenEffects) {
+    if (screenEffects[effectName].isActive) {
+      screenEffects[effectName].isActive = false;
+      screenEffects[effectName].clear();
+    }
   }
+
+  // Choose a random effect to activate
+  const availableEffects = Object.keys(screenEffects).filter(
+    effectName => !screenEffects[effectName].isActive
+  );
+  const randomEffectName = random(availableEffects);
+  const randomEffect = screenEffects[randomEffectName];
+
+  randomEffect.isActive = true;
+  randomEffect.init(); // Call the init function if it exists
+
+  randomEffect.timeout = setTimeout(() => {
+    randomEffect.isActive = false;
+    randomEffect.clear();
+  }, duration);
 }
+
 
 function clearEffect() {
   clearTimeout(screenEffectTimeout);
   screenEffectArray = [];
 }
 
-
-// generated from google gemini advance
 function blooperEffect() {
-  if (!isScreenEffectActive) return;
 
-  // Create ink splat objects if needed
-  if (screenEffectArray.length === 0) {
+  if (screenEffects.blooper.data.length === 0) {
     let amount = getRandomInt(30, 50);
 
     for (let i = 0; i < amount; i++) {
@@ -393,7 +434,6 @@ function blooperEffect() {
         fadeSpeed: getRandomArbitrary(0.003, 0.007),
       };
 
-      // Generate random points with jitter for a smoother outline
       for (let j = 0; j < 10; j++) {
         let angle = radians(j * 360 / 10);
         let offset = splat.radius * getRandomArbitrary(0.3, 0.8);
@@ -407,20 +447,20 @@ function blooperEffect() {
         });
       }
 
-      screenEffectArray.push(splat);
+      screenEffects.blooper.data.push(splat);
     }
   }
 
   push();
 
-  // Draw ink splat with smoother rendering and individual growth and fade
-  for (let i = screenEffectArray.length - 1; i >= 0; i--) {
-    let splat = screenEffectArray[i];
+  // Iterate through splats in reverse to safely remove them
+  for (let i = screenEffects.blooper.data.length - 1; i >= 0; i--) {
+    let splat = screenEffects.blooper.data[i];
 
     // Increased number of layers and smoother opacity easing
     let numLayers = 5;
     for (let layer = 0; layer < numLayers; layer++) {
-      let layerOpacity = splat.opacity * pow(1 - layer / numLayers, 2); // Exponential easing
+      let layerOpacity = splat.opacity * pow(1 - layer / numLayers, 2);
       noStroke();
       fill(color(70, 40, 10, layerOpacity * 255));
 
@@ -433,12 +473,12 @@ function blooperEffect() {
 
       // Draw the splat with curveVertex() for smoother edges
       beginShape();
-      curveVertex(splat.points[splat.points.length - 1].x, splat.points[splat.points.length - 1].y); // Wrap around
+      curveVertex(splat.points[splat.points.length - 1].x, splat.points[splat.points.length - 1].y);
       for (let point of splat.points) {
         curveVertex(point.x, point.y);
       }
-      curveVertex(splat.points[0].x, splat.points[0].y); // Wrap around
-      curveVertex(splat.points[1].x, splat.points[1].y); // Wrap around
+      curveVertex(splat.points[0].x, splat.points[0].y);
+      curveVertex(splat.points[1].x, splat.points[1].y);
       endShape(CLOSE);
     }
 
@@ -455,11 +495,21 @@ function blooperEffect() {
 
     // Remove splats when opacity reaches zero or below
     if (splat.opacity <= 0) {
-      screenEffectArray.splice(i, 1);  // Safe removal
+      screenEffects.blooper.data.splice(i, 1);
     }
   }
 
   pop();
+}
+
+
+
+function drawScreenEffects() {
+  for (let effectName in screenEffects) {
+    if (screenEffects[effectName].isActive) {
+      screenEffects[effectName].update();
+    }
+  }
 }
 
 
