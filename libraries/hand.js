@@ -42,12 +42,15 @@ function drawKeypoints(prediction) {
 }
 
 // draw viewfinder on hand location
-function draw_viewfinder(prediction) {
+function draw_viewfinder(prediction, shutter) {
   let palmbase = prediction.annotations.palmBase[0];
   palmbase = translate_coordinate(palmbase[0], palmbase[1], CANVAS_WIDTH, CANVAS_HEIGHT);
-
   push();
-  noFill();
+  if (shutter) {
+    fill(0);
+  } else {
+    noFill();
+  }
   stroke(125);
   let w = 200;
   let h = 100;
