@@ -28,7 +28,7 @@ const DEFAULT_NET_SIZE = 75;
 // gameplay globals
 let isGameOver = false;
 let mainFont;
-const START_HEALTH = 100;
+const START_HEALTH = 10;
 let ecoHealth = START_HEALTH;
 const PTS = 10;
 
@@ -108,18 +108,16 @@ function draw() {
   if (!model_ready) {
     menu();
   } else if (!hand_raised) {
-    raise_hand(); // Raise hand to trigger game
-  } 
-  else {
     if(isGameOver) {
-
       // Start over screen
       gameOver();
     } else {
-
-      // Game in action
-      gameplay_loop();
+      raise_hand(); // Raise hand to trigger game
     }
+  } 
+  else {
+    // Game in action
+    gameplay_loop();
   }
   
 }
@@ -178,7 +176,10 @@ function gameplay_loop() {
       sprites[i].offScreen = true;
 
       // If failed to capture, 
-      if (sprites.isInvasive) updateScore(false);
+      if (sprites[i].isInvasive){
+        updateScore(false);
+        console.log("Failed to capture invasive");
+      }
     }
 
     // Only draw on screen sprites
@@ -222,9 +223,10 @@ function gameplay_loop() {
   }
 
   drawNetCursor();
+  displayScore();
 
   // frame rate count. uncomment when debugging
-  text(frameRate(), 20, 20);
+  // text(frameRate(), 20, 20);
 }
 
 function resetGame(){
@@ -232,11 +234,14 @@ function resetGame(){
   ecoHealth = START_HEALTH;
   sprites = [getNewSprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
+  hand_raised = false;
 }
 
+// Game Over Screen
 function gameOver() {
-  resetGame();
-  // Display try again screen
+  // Clear the screen
+  background(backgroundImage);
+  // Ask user to try again
   push();
   textSize(100);
   let message = "game over!";
@@ -246,6 +251,10 @@ function gameOver() {
   text(message, (width - textWidth(message)) / 2, height/2);
   pop();
 
+  // Watch for hand raise again
+  if(hand_raised) {
+    isGameOver = false;
+  }
 }
 
 // generate a new sprite
@@ -408,17 +417,26 @@ function updateScore(capturedInvasive) {
     ecoHealth -= PTS;
   }
 
-  if (ecoHealth < 0) {
+  if (ecoHealth <= 0) {
     //  Lose game when health below 0
-    gameOver();
+    resetGame();
+    isGameOver = true;
     // netScore = 0;
   } 
 
-  displayScore();
+  // displayScore();
 }
 
 function displayScore() {
-  id("score").textContent = ecoHealth;
+  // id("score").textContent = ecoHealth;
+  push();
+  fill(0); // black text
+  textAlign(LEFT);
+  textSize(20);
+  let message = "Ecosystem Health: ";
+  message += str(ecoHealth);
+  text(message, 50 , 50);
+  pop();
 }
 
 
