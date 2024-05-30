@@ -16,6 +16,7 @@ let last_prediction= 0;
 let capture_millis = 0;
 let model_ready = false;
 
+// net globals
 let netControllerData;
 let net;
 
@@ -104,11 +105,8 @@ function draw() {
   if (!model_ready) {
     menu();
   } else {
-    gameplay_loop();
+   gameplay_loop();
   }
-  
-  
-
 }
 
 function menu() {
