@@ -46,10 +46,14 @@ netControllerData = {
 }
 
 let screenEffectArray = [];
+let fallingLeaves = [];
+let groundLeaves = [];
+
 let isScreenEffectActive = false;
 let screenEffectTimeout;
 
-// google gemini generated, essentially we're creating objects per effect, but not using the new JS class constructor
+// google gemini advance generated, essentially we're creating objects per effect, but not using the new JS class constructor
+
 let screenEffects = {
   blooper: {
     isActive: false,
@@ -74,6 +78,19 @@ let screenEffects = {
     update: function() {
       filter(INVERT);
     },
+  },
+  leafFall: {
+    isActive: false,
+    timeout: null,
+    init: function() {
+      fallingLeaves = []; // Clear previous leaves if any
+    },
+    clear: function() {
+      clearTimeout(this.timeout);
+      fallingLeaves = [];
+      groundLeaves = [];
+    },
+    update: leafFallEffect,
   },
   // ... add more effects here (e.g., shake, pixelate, etc.)
 };
@@ -384,7 +401,7 @@ function displayScore() {
 }
 
 
-// google gemini generated code from initial base code
+// google gemini advance generated code from initial base code
 function activateRandomScreenEffect(duration) {
   // Deactivate any currently active effect
   for (let effectName in screenEffects) {
@@ -497,6 +514,73 @@ function blooperEffect() {
     if (splat.opacity <= 0) {
       screenEffects.blooper.data.splice(i, 1);
     }
+  }
+
+  pop();
+}
+
+
+
+function leafFallEffect() {
+  if (frameCount % 5 == 0) {
+    let leaf = {
+      x: getRandomArbitrary(0, width),
+      y: -getRandomArbitrary(50, 100),
+      size: getRandomArbitrary(100, 200),
+      speed: getRandomArbitrary(3, 8),
+      rotation: getRandomArbitrary(0, 360),
+      opacity: random(0.7, 1),
+      color: color(random(180, 220), random(100, 150), random(50, 80)),
+      shapeVariation: random(0.8, 1.2),
+      windFactor: random(-0.5, 0.5),
+      targetY: random(0, height - 150), // Random target y position
+    };
+    fallingLeaves.push(leaf);
+  }
+
+  push();
+
+  for (let i = fallingLeaves.length - 1; i >= 0; i--) {
+    let leaf = fallingLeaves[i];
+
+    // Update leaf position with wind effect and check if it reached its target
+    leaf.x += leaf.windFactor;
+    if (leaf.y < leaf.targetY) {
+      leaf.y += leaf.speed;
+      leaf.rotation += leaf.speed * 0.1;
+    } else {
+      groundLeaves.push(leaf);
+      fallingLeaves.splice(i, 1);
+      continue;
+    }
+
+    // Draw leaf (no fading)
+    fill(leaf.color, leaf.opacity * 255);
+    noStroke();
+    translate(leaf.x, leaf.y);
+    rotate(radians(leaf.rotation));
+    beginShape();
+    vertex(0, -leaf.size / 2 * leaf.shapeVariation);
+    vertex(-leaf.size / 4 * leaf.shapeVariation, 0);
+    vertex(0, leaf.size / 2 * leaf.shapeVariation);
+    vertex(leaf.size / 4 * leaf.shapeVariation, 0);
+    endShape(CLOSE);
+    resetMatrix();
+  }
+
+  // Draw leaves on the ground
+  for (let leaf of groundLeaves) {
+    fill(leaf.color, leaf.opacity * 255);
+    noStroke();
+    translate(leaf.x, leaf.y);
+    rotate(radians(leaf.rotation));
+    beginShape();
+    vertex(0, -leaf.size / 2 * leaf.shapeVariation);
+    vertex(-leaf.size / 4 * leaf.shapeVariation, 0);
+    vertex(0, leaf.size / 2 * leaf.shapeVariation);
+    vertex(leaf.size / 4 * leaf.shapeVariation, 0);
+    endShape(CLOSE);
+    resetMatrix();
   }
 
   pop();
