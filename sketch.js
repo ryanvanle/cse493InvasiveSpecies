@@ -215,7 +215,7 @@ function gameplay_loop() {
   scale(-1.0,1.0);
   // draw hand
   if (predictions) {
-    bound = draw_viewfinder(predictions);
+    bound = draw_viewfinder(predictions, false);
   }
   pop();
 
@@ -271,6 +271,11 @@ function gameplay_loop() {
     if (selected) {
       if (predictions && is_closed(predictions) && millis() - capture_millis > 500) {
         cameraSound.play();
+        push();
+        translate(width,0);
+        scale(-1.0,1.0);
+        draw_viewfinder(predictions, true);
+        pop();
         const info = document.getElementById("species-info");
         const name = document.getElementById("species-name");
         const image = document.getElementById("species-image")
