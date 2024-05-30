@@ -15,14 +15,13 @@ let prediction_interval = 100;
 let last_prediction= 0;
 let capture_millis = 0;
 
+let backgroundImage;
+
 let netControllerData;
 let net;
-
 let netScore = 0;
-
 const DEFAULT_NET_SIZE = 75;
 
-let backgroundImage;
 
 net = {
   x: Number(300 / 2),
@@ -46,6 +45,9 @@ netControllerData = {
   pressed: false,
 }
 
+let screenEffectArray = [];
+let isScreenEffectActive = false;
+let screenEffectTimeout;
 
 
 // Must declare image array in preload to work
@@ -62,8 +64,6 @@ function preload() {
   backgroundImage = loadImage('img/grass.jpeg');
   cameraSound = loadSound("audio/camera.mp3");
 
-  
-
 }
 
 
@@ -73,8 +73,9 @@ function setup() {
   video = createCapture(VIDEO);
   video.size(width, height);
 
+
   soundFormats('mp3');
-  
+
   handpose = ml5.handpose(video, modelReady);
   minDistanceBetweenSprites = width/5; // at least this much margin between sprites
   resetGame();
@@ -98,10 +99,10 @@ function setup() {
 function draw() {
   // Mirror video
   // hasSetup = true;
-  
+
   netUpdate();
   background(backgroundImage);
-  
+
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
     sprites.push(getNewSprite());
@@ -170,7 +171,20 @@ function draw() {
 
   // frame rate count. uncomment when debugging
   text(frameRate(), 20, 20);
+
+  if (isScreenEffectActive) {
+    blooperEffect(); // Call blooperEffect to update and draw the splats
+  }
+
 }
+
+// Activate the effect on key press (e.g., spacebar)
+function keyPressed() {
+  if (key === 'e') {  // Change this to the desired key
+    activateRandomScreenEffect(5000); // 5-second duration
+  }
+}
+
 
 function resetGame(){
   score = 0;
@@ -342,6 +356,132 @@ function displayScore() {
   id("score").textContent = netScore;
 }
 
+function activateRandomScreenEffect(duration) {
+  if (!isScreenEffectActive) {
+    isScreenEffectActive = true;
+    screenEffectTimeout = setTimeout(() => {
+      isScreenEffectActive = false;
+      clearEffect();
+    }, duration);
+  }
+}
+
+function clearEffect() {
+  clearTimeout(screenEffectTimeout);
+  screenEffectArray = [];
+}
+
+
+// generated from google gemini advance
+function blooperEffect() {
+  if (!isScreenEffectActive) return;
+
+  // Create ink splat objects if needed
+  if (screenEffectArray.length === 0) {
+    let amount = getRandomInt(30, 50);
+
+    for (let i = 0; i < amount; i++) {
+      let splat = {
+        x: getRandomArbitrary(0, width),
+        y: getRandomArbitrary(0, height),
+        radius: getRandomArbitrary(width / 20, width / 10),
+        opacity: 1,
+        points: [],
+        growthFactor: 0,
+        isFullSize: false,
+        growthSpeed: getRandomArbitrary(0.01, 0.03),
+        fadeSpeed: getRandomArbitrary(0.003, 0.007),
+      };
+
+      // Generate random points with jitter for a smoother outline
+      for (let j = 0; j < 10; j++) {
+        let angle = radians(j * 360 / 10);
+        let offset = splat.radius * getRandomArbitrary(0.3, 0.8);
+        let jitterX = getRandomArbitrary(-offset * 0.3, offset * 0.3);
+        let jitterY = getRandomArbitrary(-offset * 0.3, offset * 0.3);
+        splat.points.push({
+          x: splat.x + cos(angle) * offset + jitterX,
+          y: splat.y + sin(angle) * offset + jitterY,
+          originalX: splat.x + cos(angle) * offset + jitterX,
+          originalY: splat.y + sin(angle) * offset + jitterY,
+        });
+      }
+
+      screenEffectArray.push(splat);
+    }
+  }
+
+  push();
+
+  // Draw ink splat with smoother rendering and individual growth and fade
+  for (let i = screenEffectArray.length - 1; i >= 0; i--) {
+    let splat = screenEffectArray[i];
+
+    // Increased number of layers and smoother opacity easing
+    let numLayers = 5;
+    for (let layer = 0; layer < numLayers; layer++) {
+      let layerOpacity = splat.opacity * pow(1 - layer / numLayers, 2); // Exponential easing
+      noStroke();
+      fill(color(70, 40, 10, layerOpacity * 255));
+
+      // Apply individual growth to each point
+      for (let j = 0; j < splat.points.length; j++) {
+        let point = splat.points[j];
+        point.x = point.originalX + splat.growthFactor * (point.originalX - splat.x);
+        point.y = point.originalY + splat.growthFactor * (point.originalY - splat.y);
+      }
+
+      // Draw the splat with curveVertex() for smoother edges
+      beginShape();
+      curveVertex(splat.points[splat.points.length - 1].x, splat.points[splat.points.length - 1].y); // Wrap around
+      for (let point of splat.points) {
+        curveVertex(point.x, point.y);
+      }
+      curveVertex(splat.points[0].x, splat.points[0].y); // Wrap around
+      curveVertex(splat.points[1].x, splat.points[1].y); // Wrap around
+      endShape(CLOSE);
+    }
+
+    // Update growth factor and check for full size
+    splat.growthFactor = min(splat.growthFactor + splat.growthSpeed, 0.7);
+    if (splat.growthFactor >= 0.7) {
+      splat.isFullSize = true;
+    }
+
+    // Fade out splat opacity completely
+    if (splat.isFullSize) {
+      splat.opacity -= splat.fadeSpeed;
+    }
+
+    // Remove splats when opacity reaches zero or below
+    if (splat.opacity <= 0) {
+      screenEffectArray.splice(i, 1);  // Safe removal
+    }
+  }
+
+  pop();
+}
+
+
+/**
+ * Returns a random number between min (inclusive) and max (exclusive)
+ */
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+/**
+* Returns a random integer between min (inclusive) and max (inclusive).
+* The value is no lower than min (or the next integer greater than min
+* if min isn't an integer) and no greater than max (or the next integer
+* lower than max if max isn't an integer).
+* Using Math.round() will give you a non-uniform distribution!
+*/
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 /**
  * Returns the element that has the ID attribute with the specified value.
