@@ -15,6 +15,7 @@ let prediction_interval = 100;
 let last_prediction= 0;
 let capture_millis = 0;
 let model_ready = false;
+let hand_raised = false;
 
 let netControllerData;
 let net;
@@ -62,9 +63,6 @@ function preload() {
 
   backgroundImage = loadImage('img/grass.jpeg');
   cameraSound = loadSound("audio/camera.mp3");
-
-  
-
 }
 
 
@@ -84,18 +82,14 @@ function setup() {
   // Hide the video element, and just show the canvas
   video.hide();
 
-  handpose.on("hand", results => {
+  handpose.on("predict", results => {
     predictions = results[0];
-    push();
-    translate(width,0);
-    scale(-1.0,1.0);
-    // draw hand
-    if (predictions) {
-      bound = draw_viewfinder(predictions);
+    if (!hand_raised && results[0] != undefined) {
+      if (results[0].handInViewConfidence > 0.9999) {
+        hand_raised = true;
+      }
     }
-    pop();
   });
-
 }
 
 function draw() {
@@ -103,12 +97,13 @@ function draw() {
   // hasSetup = true;
   if (!model_ready) {
     menu();
-  } else {
+  } else if (!hand_raised) {
+    raise_hand();
+  } 
+  else {
     gameplay_loop();
   }
   
-  
-
 }
 
 function menu() {
@@ -120,9 +115,28 @@ function menu() {
   pop();
 }
 
+function raise_hand() {
+  background(backgroundImage);
+  push();
+  textSize(50);
+  let s = "Raise Hand To Start Playing";
+  text(s, (width - textWidth(s)) / 2, height/2);
+  pop();
+}
+
 function gameplay_loop() {
   netUpdate();
   background(backgroundImage);
+
+  push();
+  translate(width,0);
+  scale(-1.0,1.0);
+  // draw hand
+  if (predictions) {
+    bound = draw_viewfinder(predictions);
+  }
+  pop();
+
   
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
