@@ -14,6 +14,7 @@ let bound = null;
 let prediction_interval = 100;
 let last_prediction= 0;
 let capture_millis = 0;
+let model_ready = false;
 
 let netControllerData;
 let net;
@@ -75,7 +76,9 @@ function setup() {
 
   soundFormats('mp3');
   
-  handpose = ml5.handpose(video, modelReady);
+  handpose = ml5.handpose(video, () => {
+    model_ready = true;
+  });
   minDistanceBetweenSprites = width/5; // at least this much margin between sprites
   resetGame();
   // Hide the video element, and just show the canvas
@@ -98,7 +101,26 @@ function setup() {
 function draw() {
   // Mirror video
   // hasSetup = true;
+  if (!model_ready) {
+    menu();
+  } else {
+    gameplay_loop();
+  }
   
+  
+
+}
+
+function menu() {
+  background(backgroundImage);
+  push();
+  textSize(50);
+  let s = "Model Loading...";
+  text(s, (width - textWidth(s)) / 2, height/2);
+  pop();
+}
+
+function gameplay_loop() {
   netUpdate();
   background(backgroundImage);
   
