@@ -110,6 +110,18 @@ function preload() {
                     loadImage('img/native/olympic_marmot.jpg'),
                     loadImage('img/native/canada_geese.jpg')];
 
+  invasiveImagesSource = [
+    'img/invasive/brown_marmorated_stinkbug.png',
+    'img/invasive/american_bullfrog.png',
+    'img/invasive/garlic_mustard.jpg'
+  ]
+
+  nativeImagesSource = [
+    'img/native/american_pika.jpg',
+    'img/native/olympic_marmot.jpg',
+    'img/native/canada_geese.jpg'
+  ] 
+
   backgroundImage = loadImage('img/grass.jpeg');
   cameraSound = loadSound("audio/camera.mp3");
 }
@@ -233,8 +245,22 @@ function gameplay_loop() {
     if (selected) {
       if (predictions && is_closed(predictions) && millis() - capture_millis > 500) {
         cameraSound.play();
-        let info = document.getElementById("species-info");
-        info.innerHTML = sprites[i].description;
+        const info = document.getElementById("species-info");
+        const name = document.getElementById("species-name");
+        const image = document.getElementById("species-image")
+        info.innerHTML = sprites[i].description.description;
+        name.innerHTML = sprites[i].description.name;
+        console.log(invasiveImages[sprites[i].typeIndex]);
+        const imgElement = document.createElement("img");
+        imgElement.setAttribute("width", "100");
+        imgElement.setAttribute("height", "100");
+        image.innerHTML = "";
+        if (sprites[i].isInvasive) {
+          imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
+        } else {
+          imgElement.src = nativeImagesSource[sprites[i].typeIndex];
+        }
+        image.appendChild(imgElement);
         capture_millis = millis();
       }
       sprites[i].displayInfo();
