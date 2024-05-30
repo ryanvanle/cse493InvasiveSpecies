@@ -103,6 +103,8 @@ function translate_coordinate(x, y, w, h) {
   return res;
 }
 
+// function to detect whether hand is closed
+// returns boolean value
 function is_closed(prediction) {
   let thumbtip = prediction.annotations.thumb[3];
   let pinkytip = prediction.annotations.pinky[3];
@@ -125,5 +127,6 @@ function is_closed(prediction) {
   }
   // palm closes at value < 30
   let value = distances / observed_points.length;
-  return (value < 35);
+  text(value, 20, 40);
+  return (value < 60);
 }

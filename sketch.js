@@ -13,6 +13,7 @@ let predictions;
 let bound = null;
 let prediction_interval = 100;
 let last_prediction= 0;
+let capture_millis = 0;
 
 let netControllerData;
 let net;
@@ -58,7 +59,10 @@ function preload() {
                     loadImage('img/native/olympic_marmot.jpg'),
                     loadImage('img/native/canada_geese.jpg')];
 
-  backgroundImage = loadImage('img/grass.jpeg')
+  backgroundImage = loadImage('img/grass.jpeg');
+  cameraSound = loadSound("audio/camera.mp3");
+
+  
 
 }
 
@@ -69,13 +73,15 @@ function setup() {
   video = createCapture(VIDEO);
   video.size(width, height);
 
+  soundFormats('mp3');
+  
   handpose = ml5.handpose(video, modelReady);
   minDistanceBetweenSprites = width/5; // at least this much margin between sprites
   resetGame();
   // Hide the video element, and just show the canvas
   video.hide();
 
-  handpose.on("predict", results => {
+  handpose.on("hand", results => {
     predictions = results[0];
     push();
     translate(width,0);
@@ -96,8 +102,6 @@ function draw() {
   netUpdate();
   background(backgroundImage);
   
-
-
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
     sprites.push(getNewSprite());
@@ -144,9 +148,11 @@ function draw() {
       }
     }
     if (selected) {
-      if (predictions && is_closed(predictions)) {
+      if (predictions && is_closed(predictions) && millis() - capture_millis > 500) {
+        cameraSound.play();
         let info = document.getElementById("species-info");
         info.innerHTML = sprites[i].description;
+        capture_millis = millis();
       }
       sprites[i].displayInfo();
     }
