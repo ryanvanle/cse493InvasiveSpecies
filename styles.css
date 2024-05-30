@@ -16,7 +16,6 @@ body {
   padding-bottom: 0.5rem;
   margin-left: 0.25rem;
   margin-right: 0.25rem;
-
 }
 
 #data {
@@ -31,4 +30,23 @@ body {
   width: 20%;
   height: 1rem;
   background-color: red;
+}
+
+html,
+body {
+  background: black;
+  color: white;
+  height: 100%;
+}
+
+main {
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+canvas {
+  border-radius: 1rem;
 }
