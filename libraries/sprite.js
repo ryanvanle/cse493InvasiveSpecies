@@ -1,7 +1,23 @@
 const spriteHeight = 45;
 const spriteWidth = 45;
 const invasiveLikelihood = 0.4;
-const speciesDescriptions = ['stinkbug', 'bullfrog', 'mustard'];
+const speciesDescriptions = [
+      {
+        name : "Brown Marmorated Stinkbug",
+        description : "Halyomorpha halys is an insect in the family Pentatomidae, native to China, Japan, Korea, and other Asian regions",
+        imageIndex : 1
+      }, 
+      {
+        name : "Bullfrog",
+        description : "Bullfrogs are predators that eat practically anything they can catch. They can swallow tree frogs, other amphibians and reptiles such as the western pond turtle, minnows, small birds, and young snakes.",
+        imageIndex : 2
+      },
+      {
+        name : "Garlic mustard",
+        description : "This plant spreads its seeds in the wind and gains a foothold in fields and forests by emerging earlier in spring than many native plants. By the time native species are ready to grow, garlic mustard has blocked their sunlight and outcompeted them for moisture and vital nutrients.",
+        imageIndex : 3
+      }
+    ];
 // const infoBoxHeight = 200;
 
 // Sprite class that holds info for each sprite
@@ -22,8 +38,13 @@ class Sprite {
 
     if(this.isInvasive) {
       this.description = speciesDescriptions[this.typeIndex];
-
       // this.spriteImage = invasiveImages[descrIndex];
+    } else {
+      this.description = {
+        name : "Friendly",
+        description : "This is a native species",
+        imageIndex : typeIndex
+      }
     }
 
     // Change this to index the corresponding invasive species
@@ -78,7 +99,7 @@ class Sprite {
 
     rectMode(CENTER)
 
-    let isFriendly = this.description == null;
+    let isFriendly = this.isInvasive;
     if (isFriendly) {
       fill("blue");
     } else {
@@ -90,7 +111,7 @@ class Sprite {
     textSize(12);
     fill(255,255,255);
     textAlign(CENTER);
-    text(description, this.x, this.y );
+    text(this.description.name, this.x, this.y );
     pop();
   }
 
