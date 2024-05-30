@@ -1,4 +1,3 @@
-
 // sprite globals
 let sprites;
 let nextSpawnDistance;
@@ -12,7 +11,7 @@ let video;
 let predictions;
 let bound = null;
 let prediction_interval = 100;
-let last_prediction= 0;
+let last_prediction = 0;
 let capture_millis = 0;
 let model_ready = false;
 let hand_raised = false;
@@ -38,21 +37,21 @@ net = {
   xSpeed: 0,
   ySpeed: 0,
   diameter: DEFAULT_NET_SIZE,
-}
+};
 
 previousNetControllerData = {
   x: 0,
   y: 0,
   z: 0,
   pressed: false,
-}
+};
 
 netControllerData = {
   x: 0,
   y: 0,
   z: 0,
   pressed: false,
-}
+};
 
 let screenEffectArray = [];
 let fallingLeaves = [];
@@ -104,12 +103,11 @@ let screenEffects = {
   // ... add more effects here (e.g., shake, pixelate, etc.)
 };
 
-
-
 // Must declare image array in preload to work
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
+
   invasiveImages = [loadImage('img/invasive/brown_marmorated_stinkbug.png'),
                     loadImage('img/invasive/american_bullfrog.png'),
                     loadImage('img/invasive/garlic_mustard.jpg')];
@@ -138,27 +136,35 @@ function preload() {
   mainFont = loadFont('assets/comic.TTF');
 }
 
-
 function setup() {
-  createCanvas(window.innerWidth, window.innerWidth * 9 / 16);
+  let canvasWidth = window.innerWidth - 100;
+  let canvasHeight = (canvasWidth * 9) / 16;
+
+  if (canvasHeight > window.innerHeight - 100) {
+    canvasHeight = window.innerHeight - 100;
+    canvasWidth = (canvasHeight * 16) / 9;
+  }
+
+  createCanvas(canvasWidth, canvasHeight);
   spriteMillis = millis();
   video = createCapture(VIDEO);
   video.size(width, height);
   textFont(mainFont);
 
 
-  soundFormats('mp3');
+  soundFormats("mp3");
 
   handpose = ml5.handpose(video, () => {
     model_ready = true;
   });
 
-  minDistanceBetweenSprites = width/5; // at least this much margin between sprites
+  minDistanceBetweenSprites = width / 5; // at least this much margin between sprites
+
   resetGame();
   // Hide the video element, and just show the canvas
   video.hide();
 
-  handpose.on("predict", results => {
+  handpose.on("predict", (results) => {
     predictions = results[0];
     if (!hand_raised && results[0] != undefined) {
       if (results[0].handInViewConfidence > 0.9999) {
@@ -190,7 +196,7 @@ function menu() {
   push();
   textSize(50);
   let s = "Model Loading...";
-  text(s, (width - textWidth(s)) / 2, height/2);
+  text(s, (width - textWidth(s)) / 2, height / 2);
   pop();
 }
 
@@ -211,8 +217,8 @@ function gameplay_loop() {
   background(backgroundImage);
 
   push();
-  translate(width,0);
-  scale(-1.0,1.0);
+  translate(width, 0);
+  scale(-1.0, 1.0);
   // draw hand
   if (predictions) {
     bound = draw_viewfinder(predictions, false);
@@ -220,24 +226,27 @@ function gameplay_loop() {
   pop();
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
-  if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
+  if (
+    sprites.length <= 0 ||
+    sprites[sprites.length - 1].x >= nextSpawnDistance
+  ) {
     sprites.push(getNewSprite());
     // nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
     // print(nextSpawnDistance);
   }
 
   // loop through all the sprites and update them
-  for(let i = 0; i < sprites.length; i++){
+  for (let i = 0; i < sprites.length; i++) {
     // check if sprite is in hand
     let selected = false;
     if (bound) {
-      selected = in_rect({x: sprites[i].x, y: sprites[i].y}, bound);
+      selected = in_rect({ x: sprites[i].x, y: sprites[i].y }, bound);
     }
 
     sprites[i].update();
 
     // remove sprites that have gone off the screen
-    if(sprites[i].x + sprites[i].width > width){
+    if (sprites[i].x + sprites[i].width > width) {
       sprites[i].offScreen = true;
 
       // If failed to capture,
@@ -248,16 +257,14 @@ function gameplay_loop() {
     }
 
     // Only draw on screen sprites
-    if(!sprites[i].offScreen) {
-
+    if (!sprites[i].offScreen) {
       // INVASIVE
-      if(sprites[i].isInvasive){
+      if (sprites[i].isInvasive) {
         // print(invasiveImages);
         // print("Type index: ");
         // print(sprites[i].typeIndex);
         sprites[i].draw(invasiveImages[sprites[i].typeIndex]);
       } else {
-
         // NATIVE
         // console.log(sprites[i].typeIndex);
         // print(nativeImages);
@@ -269,7 +276,11 @@ function gameplay_loop() {
       }
     }
     if (selected) {
-      if (predictions && is_closed(predictions) && millis() - capture_millis > 500) {
+      if (
+        predictions &&
+        is_closed(predictions) &&
+        millis() - capture_millis > 500
+      ) {
         cameraSound.play();
         push();
         translate(width,0);
@@ -302,7 +313,7 @@ function gameplay_loop() {
   }
   // Check if furthest sprite has gone off screen
   // Delete from list to prevent from getting unnecessarily long
-  if(sprites[0].offScreen) {
+  if (sprites[0].offScreen) {
     sprites.splice(0, 1);
   }
 
@@ -316,6 +327,7 @@ function gameplay_loop() {
 
   drawScreenEffects();
 }
+
 
 function keyPressed() {
   if (key === 'e') {
@@ -360,15 +372,13 @@ function getNewSprite() {
 
 // Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw
 
-
-const ws = new WebSocket('ws://localhost:8005');
+const ws = new WebSocket("ws://localhost:8005");
 
 ws.onopen = () => {
-  console.log('Connected to the server');
+  console.log("Connected to the server");
 };
 
 ws.onmessage = (event) => {
-
   // console.log(event.data);
   let data = event.data.split(",");
   let isPressed = data[3] === "true";
@@ -379,19 +389,15 @@ ws.onmessage = (event) => {
     x: Number(data[0]),
     y: Number(data[1]),
     z: Number(data[2]),
-    pressed: isPressed
-  }
-
+    pressed: isPressed,
+  };
 };
 
 ws.onclose = () => {
-  console.log('Disconnected from the server');
+  console.log("Disconnected from the server");
 };
 
-
-
 function netUpdate() {
-
   // if (!hasSetup) return;
 
   let isPressed = netControllerData.pressed;
@@ -405,14 +411,13 @@ function netUpdate() {
   } else {
     updateNetPosition();
   }
-
 }
 
 function drawNetCursor() {
   push();
   strokeWeight(4);
 
-  let strokeColor = netControllerData.pressed ? "red" : "black"
+  let strokeColor = netControllerData.pressed ? "red" : "black";
   stroke(strokeColor);
 
   noFill();
@@ -425,11 +430,10 @@ function lockNetPosition() {
   net.ySpeed = 0;
 }
 
-
 function netSpeciesHoverChecker(specie) {
   if (specie.offScreen) return;
 
-  let netRadius = net.diameter/2;
+  let netRadius = net.diameter / 2;
   let netXEdgeLeft = net.x - netRadius;
   let netXEdgeRight = net.x + netRadius;
   let netYEdgeBottom = net.y - netRadius;
@@ -442,25 +446,19 @@ function netSpeciesHoverChecker(specie) {
 }
 
 function isSwingingChecker() {
-
   let previousZ = previousNetControllerData.z;
   let currentZ = netControllerData.z;
 
   if (previousZ < currentZ) return false;
   if (previousZ <= 0) return false; // is in currentSwing range;
 
-
   let threshold = 5;
   const difference = Math.abs(previousZ - currentZ);
   const isValidSwing = difference >= threshold;
   return isValidSwing;
-
 }
 
-
 function updateNetPosition() {
-
-
   net.xSpeed = -netControllerData.y;
   net.ySpeed = -netControllerData.z;
 
@@ -473,15 +471,16 @@ function updateNetPosition() {
 function isInNetBoundsChecker() {
   let nextXPosition = net.x + net.xSpeed;
   let nextYPosition = net.y + net.ySpeed;
-  let netRadius = net.diameter/2;
-  let isOutOfBoundsX = nextXPosition < 0 + netRadius || nextXPosition > width - netRadius;
-  let isOutOfBoundsY = nextYPosition < 0 + netRadius || nextYPosition > height - netRadius;
+  let netRadius = net.diameter / 2;
+  let isOutOfBoundsX =
+    nextXPosition < 0 + netRadius || nextXPosition > width - netRadius;
+  let isOutOfBoundsY =
+    nextYPosition < 0 + netRadius || nextYPosition > height - netRadius;
   let isInBounds = !(isOutOfBoundsX || isOutOfBoundsY);
   return isInBounds;
 }
 
 function updateCapture() {
-
   console.log("in updateCapture");
 
   for (let specie of sprites) {
@@ -497,8 +496,8 @@ function updateCapture() {
       updateScore(false);
     }
   }
-
 }
+
 
 // When an animal is captured, updates score according to
 // its identity (native vs invasive)
@@ -761,28 +760,28 @@ function id(idName) {
 }
 
 /**
-* Returns the first element that matches the given CSS selector.
-* @param {string} selector - CSS query selector.
-* @returns {object} The first DOM object matching the query.
-*/
+ * Returns the first element that matches the given CSS selector.
+ * @param {string} selector - CSS query selector.
+ * @returns {object} The first DOM object matching the query.
+ */
 function qs(selector) {
   return document.querySelector(selector);
 }
 
 /**
-* Returns the array of elements that match the given CSS selector.
-* @param {string} selector - CSS query selector
-* @returns {object[]} array of DOM objects matching the query.
-*/
+ * Returns the array of elements that match the given CSS selector.
+ * @param {string} selector - CSS query selector
+ * @returns {object[]} array of DOM objects matching the query.
+ */
 function qsa(selector) {
   return document.querySelectorAll(selector);
 }
 
 /**
-* Returns a new element with the given tag name.
-* @param {string} tagName - HTML tag name for new DOM element.
-* @returns {object} New DOM object for given HTML tag.
-*/
+ * Returns a new element with the given tag name.
+ * @param {string} tagName - HTML tag name for new DOM element.
+ * @returns {object} New DOM object for given HTML tag.
+ */
 function gen(tagName) {
   return document.createElement(tagName);
 }
