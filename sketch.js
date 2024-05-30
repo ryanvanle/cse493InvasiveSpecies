@@ -25,6 +25,10 @@ let netScore = 0;
 
 const DEFAULT_NET_SIZE = 75;
 
+// gameplay globals
+let isGameOver = false;
+let mainFont;
+
 let backgroundImage;
 
 net = {
@@ -64,6 +68,7 @@ function preload() {
 
   backgroundImage = loadImage('img/grass.jpeg');
   cameraSound = loadSound("audio/camera.mp3");
+  mainFont = loadFont('assets/Organo.ttf');
 }
 
 
@@ -72,6 +77,7 @@ function setup() {
   spriteMillis = millis();
   video = createCapture(VIDEO);
   video.size(width, height);
+  textFont(mainFont);
 
   soundFormats('mp3');
   
@@ -99,10 +105,18 @@ function draw() {
   if (!model_ready) {
     menu();
   } else if (!hand_raised) {
-    raise_hand();
+    raise_hand(); // Raise hand to trigger game
   } 
   else {
-    gameplay_loop();
+    if(isGameOver) {
+
+      // Start over screen
+      gameOver();
+    } else {
+
+      // Game in action
+      gameplay_loop();
+    }
   }
   
 }
@@ -213,6 +227,10 @@ function resetGame(){
   score = 0;
   sprites = [getNewSprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
+}
+
+function gameOver() {
+
 }
 
 // generate a new sprite
