@@ -17,13 +17,20 @@ let capture_millis = 0;
 let model_ready = false;
 let hand_raised = false;
 
-let backgroundImage;
-
+// net globals
 let netControllerData;
 let net;
 let netScore = 0;
 const DEFAULT_NET_SIZE = 75;
 
+// gameplay globals
+let isGameOver = false;
+let mainFont;
+const START_HEALTH = 10;
+let ecoHealth = START_HEALTH;
+const PTS = 10;
+
+let backgroundImage;
 
 net = {
   x: Number(300 / 2),
@@ -110,8 +117,12 @@ function preload() {
                     loadImage('img/native/olympic_marmot.jpg'),
                     loadImage('img/native/canada_geese.jpg')];
 
-  backgroundImage = loadImage('img/grass.jpeg');
+  // Image Attribution: Image by brgfx on Freepik
+  backgroundImage = loadImage('img/rocky_cliff.jpg');
+  // backgroundImage = loadImage('img/grass.jpeg');
   cameraSound = loadSound("audio/camera.mp3");
+  // mainFont = loadFont('assets/Organo.ttf');
+  mainFont = loadFont('assets/comic.TTF');
 }
 
 
@@ -120,10 +131,11 @@ function setup() {
   spriteMillis = millis();
   video = createCapture(VIDEO);
   video.size(width, height);
+  textFont(mainFont);
 
 
   soundFormats('mp3');
-  
+
   handpose = ml5.handpose(video, () => {
     model_ready = true;
   });
@@ -147,9 +159,15 @@ function draw() {
   if (!model_ready) {
     menu();
   } else if (!hand_raised) {
-    raise_hand();
-  } 
+    if(isGameOver) {
+      // Start over screen
+      gameOver();
+    } else {
+      raise_hand(); // Raise hand to trigger game
+    }
+  }
   else {
+    // Game in action
     gameplay_loop();
   }
 }
@@ -166,8 +184,11 @@ function menu() {
 function raise_hand() {
   background(backgroundImage);
   push();
+  textSize(100);
+  let s = "Space Invaders"
+  text(s, (width - textWidth(s)) / 2, height/3);
   textSize(50);
-  let s = "Raise Hand To Start Playing";
+  s = "raise hand to start playing";
   text(s, (width - textWidth(s)) / 2, height/2);
   pop();
 }
@@ -206,7 +227,11 @@ function gameplay_loop() {
     if(sprites[i].x + sprites[i].width > width){
       sprites[i].offScreen = true;
 
-      if (sprites.isInvasive) updateScore(false);
+      // If failed to capture,
+      if (sprites[i].isInvasive){
+        updateScore(false);
+        console.log("Failed to capture invasive");
+      }
     }
 
     // Only draw on screen sprites
@@ -250,8 +275,10 @@ function gameplay_loop() {
   }
 
   drawNetCursor();
+  displayScore();
 
   // frame rate count. uncomment when debugging
+  // text(frameRate(), 20, 20);
   text(frameRate(), 20, 20);
 
 
@@ -266,9 +293,31 @@ function keyPressed() {
 
 
 function resetGame(){
-  score = 0;
+  // netScore = 0;
+  ecoHealth = START_HEALTH;
   sprites = [getNewSprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
+  hand_raised = false;
+}
+
+// Game Over Screen
+function gameOver() {
+  // Clear the screen
+  background(backgroundImage);
+  // Ask user to try again
+  push();
+  textSize(100);
+  let message = "game over!";
+  textSize(50);
+  text(message, (width - textWidth(message)) / 2, height/3);
+  message = "raise hand to try again";
+  text(message, (width - textWidth(message)) / 2, height/2);
+  pop();
+
+  // Watch for hand raise again
+  if(hand_raised) {
+    isGameOver = false;
+  }
 }
 
 // generate a new sprite
@@ -407,6 +456,7 @@ function updateCapture() {
     if (specie.offScreen) continue;
     if (!specie.isHighlighted) continue;
 
+    // If species on-screen and selected
     specie.offScreen = true;
 
     if (specie.isInvasive) {
@@ -418,21 +468,38 @@ function updateCapture() {
 
 }
 
-
-function updateScore(didGain) {
-  if (didGain) {
-    netScore += 1;
+// When an animal is captured, updates score according to
+// its identity (native vs invasive)
+function updateScore(capturedInvasive) {
+  if (capturedInvasive) {
+    // netScore += 1;
+    ecoHealth += PTS;
   } else {
-    netScore--;
+    // captured native animal or failed to capture invasive
+    // netScore--;
+    ecoHealth -= PTS;
   }
 
-  if (netScore < 0) netScore = 0;
+  if (ecoHealth <= 0) {
+    //  Lose game when health below 0
+    resetGame();
+    isGameOver = true;
+    // netScore = 0;
+  }
 
-  displayScore();
+  // displayScore();
 }
 
 function displayScore() {
-  id("score").textContent = netScore;
+  // id("score").textContent = ecoHealth;
+  push();
+  fill(0); // black text
+  textAlign(LEFT);
+  textSize(20);
+  let message = "Ecosystem Health: ";
+  message += str(ecoHealth);
+  text(message, 50 , 50);
+  pop();
 }
 
 
