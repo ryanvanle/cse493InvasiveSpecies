@@ -288,9 +288,9 @@ function gameplay_loop() {
         scale(-1.0, 1.0);
         draw_viewfinder(predictions, true);
         pop();
-        const info = document.getElementById("species-info");
-        const name = document.getElementById("species-name");
-        const image = document.getElementById("species-image");
+        const info = id("species-info");
+        const name = id("species-name");
+        const image = id("species-image");
 
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
@@ -350,6 +350,7 @@ function resetGame() {
 function gameOver() {
   // Clear the screen
   background(backgroundImage);
+  updateHealthBar(0);
   // Ask user to try again
   push();
   textSize(100);
@@ -363,6 +364,7 @@ function gameOver() {
   // Watch for hand raise again
   if (hand_raised) {
     isGameOver = false;
+    updateHealthBar(1);
   }
 }
 
@@ -524,6 +526,10 @@ function updateScore(capturedInvasive) {
 
 function displayScore() {
   let currHealth = ecoHealth / START_HEALTH;
+  updateHealthBar(currHealth);
+}
+
+function updateHealthBar(percentage) {
   let healthBarColors = [
     "#dc2626",
     "#f97316",
@@ -534,17 +540,24 @@ function displayScore() {
   ];
 
   let healthBarColor =
-    healthBarColors[floor(currHealth * healthBarColors.length)];
+    healthBarColors[floor(percentage * healthBarColors.length)];
 
-  const healthBar = document.getElementById("health-bar");
-  healthBar.style.width = currHealth * 100 + "%";
+  const healthBar = id("health-bar");
+  healthBar.style.width = percentage * 100 + "%";
   healthBar.style.backgroundColor = healthBarColor;
 
-  const ecoHealthText = document.getElementById("ecohealth");
-  ecoHealthText.innerHTML = currHealth * 100 + "%";
+  const ecoHealthText = id("ecohealth");
+  ecoHealthText.innerHTML = percentage * 100 + "%";
 
-  if (currHealth <= 0.9) {
+  if (percentage <= 0.9) {
     ecoHealthText.style.color = "white";
+  } else {
+    ecoHealthText.style.color = "black";
+  }
+
+  if (percentage == 1) {
+    healthBar.style.backgroundColor =
+      healthBarColors[healthBarColors.length - 1];
   }
 }
 
