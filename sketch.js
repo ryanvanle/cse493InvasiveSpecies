@@ -391,7 +391,19 @@ const ws = new WebSocket("ws://localhost:8005");
 
 ws.onopen = () => {
   console.log("Connected to the server");
+
+  const sampleImageData = "base64EncodedImageData";
+  const sampleDescription = "description";
+  const sampleTitle = "hi! :D";
+
+  sendDataToServer(sampleImageData, sampleDescription, sampleTitle);
 };
+
+function sendDataToServer(imageData, description, title) {
+  const dataToSend = JSON.stringify({ image: imageData, description, title });
+  ws.send(dataToSend);
+}
+
 
 ws.onmessage = (event) => {
   // console.log(event.data);
