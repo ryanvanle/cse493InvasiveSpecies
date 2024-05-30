@@ -31,6 +31,8 @@ const PTS = 1;
 
 let backgroundImage;
 
+const SHOW_TOP_BAR = true;
+
 net = {
   x: Number(300 / 2),
   y: Number(200 / 2),
@@ -176,7 +178,16 @@ function setup() {
   });
 }
 
+function hideTopBar() {
+  if (!SHOW_TOP_BAR) {
+    let topBar = id("top-bar");
+    topBar.style.display = "none";
+  }
+}
+
 function draw() {
+  hideTopBar();
+
   if (!model_ready) {
     menu();
   } else if (!hand_raised) {
@@ -276,6 +287,11 @@ function gameplay_loop() {
         // sprites[i].draw(null);
       }
     }
+    const speciesIdentifier = id("species-identifier");
+    const imgElement = id("species-image");
+    const info = id("species-info");
+    const name = id("species-name");
+
     if (selected) {
       if (
         predictions &&
@@ -288,25 +304,20 @@ function gameplay_loop() {
         scale(-1.0, 1.0);
         draw_viewfinder(predictions, true);
         pop();
-        const info = id("species-info");
-        const name = id("species-name");
-        const image = id("species-image");
 
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
-        // console.log(invasiveImages[sprites[i].typeIndex]);
 
-        const imgElement = document.createElement("img");
-        imgElement.setAttribute("width", "100");
-        imgElement.setAttribute("height", "100");
-
-        image.innerHTML = "";
         if (sprites[i].isInvasive) {
           imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
+          imgElement.style.display = "block";
+          speciesIdentifier.innerHTML = "Invasive ❌";
         } else {
+          console.log("Native!!!!");
           imgElement.src = nativeImagesSource[sprites[i].typeIndex];
+          imgElement.style.display = "block";
+          speciesIdentifier.innerHTML = "Native ✅";
         }
-        image.appendChild(imgElement);
 
         capture_millis = millis();
       }
