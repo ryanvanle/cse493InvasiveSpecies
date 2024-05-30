@@ -28,6 +28,9 @@ const DEFAULT_NET_SIZE = 75;
 // gameplay globals
 let isGameOver = false;
 let mainFont;
+const START_HEALTH = 100;
+let ecoHealth = START_HEALTH;
+const PTS = 10;
 
 let backgroundImage;
 
@@ -134,7 +137,7 @@ function raise_hand() {
   background(backgroundImage);
   push();
   textSize(50);
-  let s = "Raise Hand To Start Playing";
+  let s = "raise hand to start playing";
   text(s, (width - textWidth(s)) / 2, height/2);
   pop();
 }
@@ -174,6 +177,7 @@ function gameplay_loop() {
     if(sprites[i].x + sprites[i].width > width){
       sprites[i].offScreen = true;
 
+      // If failed to capture, 
       if (sprites.isInvasive) updateScore(false);
     }
 
@@ -224,12 +228,23 @@ function gameplay_loop() {
 }
 
 function resetGame(){
-  score = 0;
+  // netScore = 0;
+  ecoHealth = START_HEALTH;
   sprites = [getNewSprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width/3);
 }
 
 function gameOver() {
+  resetGame();
+  // Display try again screen
+  push();
+  textSize(100);
+  let message = "game over!";
+  textSize(50);
+  text(message, (width - textWidth(message)) / 2, height/3);
+  message = "raise hand to try again";
+  text(message, (width - textWidth(message)) / 2, height/2);
+  pop();
 
 }
 
@@ -369,6 +384,7 @@ function updateCapture() {
     if (specie.offScreen) continue;
     if (!specie.isHighlighted) continue;
 
+    // If species on-screen and selected
     specie.offScreen = true;
 
     if (specie.isInvasive) {
@@ -380,21 +396,29 @@ function updateCapture() {
 
 }
 
-
-function updateScore(didGain) {
-  if (didGain) {
-    netScore += 1;
+// When an animal is captured, updates score according to
+// its identity (native vs invasive)
+function updateScore(capturedInvasive) {
+  if (capturedInvasive) {
+    // netScore += 1;
+    ecoHealth += PTS;
   } else {
-    netScore--;
+    // captured native animal or failed to capture invasive
+    // netScore--;
+    ecoHealth -= PTS;
   }
 
-  if (netScore < 0) netScore = 0;
+  if (ecoHealth < 0) {
+    //  Lose game when health below 0
+    gameOver();
+    // netScore = 0;
+  } 
 
   displayScore();
 }
 
 function displayScore() {
-  id("score").textContent = netScore;
+  id("score").textContent = ecoHealth;
 }
 
 
