@@ -17,14 +17,13 @@ let capture_millis = 0;
 let model_ready = false;
 let hand_raised = false;
 
+let backgroundImage;
+
 let netControllerData;
 let net;
-
 let netScore = 0;
-
 const DEFAULT_NET_SIZE = 75;
 
-let backgroundImage;
 
 net = {
   x: Number(300 / 2),
@@ -47,6 +46,56 @@ netControllerData = {
   z: 0,
   pressed: false,
 }
+
+let screenEffectArray = [];
+let fallingLeaves = [];
+let groundLeaves = [];
+
+let isScreenEffectActive = false;
+let screenEffectTimeout;
+
+// google gemini advance generated, essentially we're creating objects per effect, but not using the new JS class constructor
+
+let screenEffects = {
+  blooper: {
+    isActive: false,
+    timeout: null,
+    data: [],
+    init: function() {
+      this.data = [];
+    },
+    clear: function() {
+      clearTimeout(this.timeout);
+      this.data = [];
+    },
+    update: blooperEffect,
+  },
+  colorInvert: {
+    isActive: false,
+    timeout: null,
+    init: function() {},
+    clear: function() {
+      clearTimeout(this.timeout);
+    },
+    update: function() {
+      filter(INVERT);
+    },
+  },
+  leafFall: {
+    isActive: false,
+    timeout: null,
+    init: function() {
+      fallingLeaves = []; // Clear previous leaves if any
+    },
+    clear: function() {
+      clearTimeout(this.timeout);
+      fallingLeaves = [];
+      groundLeaves = [];
+    },
+    update: leafFallEffect,
+  },
+  // ... add more effects here (e.g., shake, pixelate, etc.)
+};
 
 
 
@@ -72,11 +121,13 @@ function setup() {
   video = createCapture(VIDEO);
   video.size(width, height);
 
+
   soundFormats('mp3');
   
   handpose = ml5.handpose(video, () => {
     model_ready = true;
   });
+
   minDistanceBetweenSprites = width/5; // at least this much margin between sprites
   resetGame();
   // Hide the video element, and just show the canvas
@@ -93,8 +144,6 @@ function setup() {
 }
 
 function draw() {
-  // Mirror video
-  // hasSetup = true;
   if (!model_ready) {
     menu();
   } else if (!hand_raised) {
@@ -103,7 +152,6 @@ function draw() {
   else {
     gameplay_loop();
   }
-  
 }
 
 function menu() {
@@ -137,7 +185,6 @@ function gameplay_loop() {
   }
   pop();
 
-  
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (sprites.length <= 0 || sprites[sprites.length-1].x >= nextSpawnDistance){
     sprites.push(getNewSprite());
@@ -206,7 +253,17 @@ function gameplay_loop() {
 
   // frame rate count. uncomment when debugging
   text(frameRate(), 20, 20);
+
+
+  drawScreenEffects();
 }
+
+function keyPressed() {
+  if (key === 'e') {
+    activateRandomScreenEffect(5000);
+  }
+}
+
 
 function resetGame(){
   score = 0;
@@ -378,6 +435,222 @@ function displayScore() {
   id("score").textContent = netScore;
 }
 
+
+// google gemini advance generated code from initial base code
+function activateRandomScreenEffect(duration) {
+  // Deactivate any currently active effect
+  for (let effectName in screenEffects) {
+    if (screenEffects[effectName].isActive) {
+      screenEffects[effectName].isActive = false;
+      screenEffects[effectName].clear();
+    }
+  }
+
+  // Choose a random effect to activate
+  const availableEffects = Object.keys(screenEffects).filter(
+    effectName => !screenEffects[effectName].isActive
+  );
+  const randomEffectName = random(availableEffects);
+  const randomEffect = screenEffects[randomEffectName];
+
+  randomEffect.isActive = true;
+  randomEffect.init(); // Call the init function if it exists
+
+  randomEffect.timeout = setTimeout(() => {
+    randomEffect.isActive = false;
+    randomEffect.clear();
+  }, duration);
+}
+
+
+function clearEffect() {
+  clearTimeout(screenEffectTimeout);
+  screenEffectArray = [];
+}
+
+function blooperEffect() {
+
+  if (screenEffects.blooper.data.length === 0) {
+    let amount = getRandomInt(30, 50);
+
+    for (let i = 0; i < amount; i++) {
+      let splat = {
+        x: getRandomArbitrary(0, width),
+        y: getRandomArbitrary(0, height),
+        radius: getRandomArbitrary(width / 20, width / 10),
+        opacity: 1,
+        points: [],
+        growthFactor: 0,
+        isFullSize: false,
+        growthSpeed: getRandomArbitrary(0.01, 0.03),
+        fadeSpeed: getRandomArbitrary(0.003, 0.007),
+      };
+
+      for (let j = 0; j < 10; j++) {
+        let angle = radians(j * 360 / 10);
+        let offset = splat.radius * getRandomArbitrary(0.3, 0.8);
+        let jitterX = getRandomArbitrary(-offset * 0.3, offset * 0.3);
+        let jitterY = getRandomArbitrary(-offset * 0.3, offset * 0.3);
+        splat.points.push({
+          x: splat.x + cos(angle) * offset + jitterX,
+          y: splat.y + sin(angle) * offset + jitterY,
+          originalX: splat.x + cos(angle) * offset + jitterX,
+          originalY: splat.y + sin(angle) * offset + jitterY,
+        });
+      }
+
+      screenEffects.blooper.data.push(splat);
+    }
+  }
+
+  push();
+
+  // Iterate through splats in reverse to safely remove them
+  for (let i = screenEffects.blooper.data.length - 1; i >= 0; i--) {
+    let splat = screenEffects.blooper.data[i];
+
+    // Increased number of layers and smoother opacity easing
+    let numLayers = 5;
+    for (let layer = 0; layer < numLayers; layer++) {
+      let layerOpacity = splat.opacity * pow(1 - layer / numLayers, 2);
+      noStroke();
+      fill(color(70, 40, 10, layerOpacity * 255));
+
+      // Apply individual growth to each point
+      for (let j = 0; j < splat.points.length; j++) {
+        let point = splat.points[j];
+        point.x = point.originalX + splat.growthFactor * (point.originalX - splat.x);
+        point.y = point.originalY + splat.growthFactor * (point.originalY - splat.y);
+      }
+
+      // Draw the splat with curveVertex() for smoother edges
+      beginShape();
+      curveVertex(splat.points[splat.points.length - 1].x, splat.points[splat.points.length - 1].y);
+      for (let point of splat.points) {
+        curveVertex(point.x, point.y);
+      }
+      curveVertex(splat.points[0].x, splat.points[0].y);
+      curveVertex(splat.points[1].x, splat.points[1].y);
+      endShape(CLOSE);
+    }
+
+    // Update growth factor and check for full size
+    splat.growthFactor = min(splat.growthFactor + splat.growthSpeed, 0.7);
+    if (splat.growthFactor >= 0.7) {
+      splat.isFullSize = true;
+    }
+
+    // Fade out splat opacity completely
+    if (splat.isFullSize) {
+      splat.opacity -= splat.fadeSpeed;
+    }
+
+    // Remove splats when opacity reaches zero or below
+    if (splat.opacity <= 0) {
+      screenEffects.blooper.data.splice(i, 1);
+    }
+  }
+
+  pop();
+}
+
+
+
+function leafFallEffect() {
+  if (frameCount % 5 == 0) {
+    let leaf = {
+      x: getRandomArbitrary(0, width),
+      y: -getRandomArbitrary(50, 100),
+      size: getRandomArbitrary(100, 200),
+      speed: getRandomArbitrary(3, 8),
+      rotation: getRandomArbitrary(0, 360),
+      opacity: random(0.7, 1),
+      color: color(random(180, 220), random(100, 150), random(50, 80)),
+      shapeVariation: random(0.8, 1.2),
+      windFactor: random(-0.5, 0.5),
+      targetY: random(0, height - 150), // Random target y position
+    };
+    fallingLeaves.push(leaf);
+  }
+
+  push();
+
+  for (let i = fallingLeaves.length - 1; i >= 0; i--) {
+    let leaf = fallingLeaves[i];
+
+    // Update leaf position with wind effect and check if it reached its target
+    leaf.x += leaf.windFactor;
+    if (leaf.y < leaf.targetY) {
+      leaf.y += leaf.speed;
+      leaf.rotation += leaf.speed * 0.1;
+    } else {
+      groundLeaves.push(leaf);
+      fallingLeaves.splice(i, 1);
+      continue;
+    }
+
+    // Draw leaf (no fading)
+    fill(leaf.color, leaf.opacity * 255);
+    noStroke();
+    translate(leaf.x, leaf.y);
+    rotate(radians(leaf.rotation));
+    beginShape();
+    vertex(0, -leaf.size / 2 * leaf.shapeVariation);
+    vertex(-leaf.size / 4 * leaf.shapeVariation, 0);
+    vertex(0, leaf.size / 2 * leaf.shapeVariation);
+    vertex(leaf.size / 4 * leaf.shapeVariation, 0);
+    endShape(CLOSE);
+    resetMatrix();
+  }
+
+  // Draw leaves on the ground
+  for (let leaf of groundLeaves) {
+    fill(leaf.color, leaf.opacity * 255);
+    noStroke();
+    translate(leaf.x, leaf.y);
+    rotate(radians(leaf.rotation));
+    beginShape();
+    vertex(0, -leaf.size / 2 * leaf.shapeVariation);
+    vertex(-leaf.size / 4 * leaf.shapeVariation, 0);
+    vertex(0, leaf.size / 2 * leaf.shapeVariation);
+    vertex(leaf.size / 4 * leaf.shapeVariation, 0);
+    endShape(CLOSE);
+    resetMatrix();
+  }
+
+  pop();
+}
+
+
+
+function drawScreenEffects() {
+  for (let effectName in screenEffects) {
+    if (screenEffects[effectName].isActive) {
+      screenEffects[effectName].update();
+    }
+  }
+}
+
+
+/**
+ * Returns a random number between min (inclusive) and max (exclusive)
+ */
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+/**
+* Returns a random integer between min (inclusive) and max (inclusive).
+* The value is no lower than min (or the next integer greater than min
+* if min isn't an integer) and no greater than max (or the next integer
+* lower than max if max isn't an integer).
+* Using Math.round() will give you a non-uniform distribution!
+*/
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 /**
  * Returns the element that has the ID attribute with the specified value.
