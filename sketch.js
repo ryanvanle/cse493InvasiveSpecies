@@ -25,7 +25,7 @@ const DEFAULT_NET_SIZE = 75;
 // gameplay globals
 let isGameOver = false;
 let mainFont;
-const START_HEALTH = 10;
+const START_HEALTH = 1;
 let ecoHealth = START_HEALTH;
 const PTS = 1;
 
@@ -372,7 +372,18 @@ function gameOver() {
   text(message, (width - textWidth(message)) / 2, height / 2);
   pop();
 
-  // Watch for hand raise again
+  // Debounce if hand immediately detected again so that
+  // "Game Over" shows
+  setTimeout(checkResetGame, 2000);
+
+  // // Watch for hand raise again
+  // if (hand_raised) {
+  //   isGameOver = false;
+  //   updateHealthBar(1);
+  // }
+}
+
+function checkResetGame() {
   if (hand_raised) {
     isGameOver = false;
     updateHealthBar(1);
