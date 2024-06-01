@@ -20,6 +20,7 @@ let hand_raised = false;
 let netControllerData;
 let net;
 let netScore = 0;
+let netSound;
 const DEFAULT_NET_SIZE = window.innerWidth / 10;
 
 // gameplay globals
@@ -137,6 +138,7 @@ function preload() {
   // backgroundImage = loadImage('img/grass.jpeg');
 
   cameraSound = loadSound("audio/camera.mp3");
+  netSound = loadSound("audio/swing.mp3");
   // mainFont = loadFont('assets/Organo.ttf');
   mainFont = loadFont("assets/comic.TTF");
 }
@@ -447,6 +449,8 @@ function netUpdate() {
 
   if (isCatching) {
     lockNetPosition();
+    netSound.play();
+
     updateCapture();
   } else if (isPressed) {
     lockNetPosition();
