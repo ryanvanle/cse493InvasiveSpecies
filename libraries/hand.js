@@ -86,10 +86,24 @@ function draw_viewfinder(prediction, shutter) {
   } else {
     noFill();
   }
-  stroke(125);
-  let w = 200;
-  let h = 100;
+
+  let w = window.innerWidth / 6;
+  let h = window.innerHeight / 6;
   let diameter = 40;
+
+
+  // white outline for the black outline
+  strokeWeight(14);
+  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
+
+
+  //black outline
+
+
+
+  strokeWeight(10);
+  stroke(255);
+
   rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
   circle(palmbase[0], palmbase[1] - h / 2, diameter);
   line(

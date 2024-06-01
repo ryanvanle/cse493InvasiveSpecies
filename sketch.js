@@ -20,7 +20,8 @@ let hand_raised = false;
 let netControllerData;
 let net;
 let netScore = 0;
-const DEFAULT_NET_SIZE = 75;
+let netSound;
+const DEFAULT_NET_SIZE = window.innerWidth / 10;
 
 // gameplay globals
 let isGameOver = false;
@@ -137,6 +138,7 @@ function preload() {
   // backgroundImage = loadImage('img/grass.jpeg');
 
   cameraSound = loadSound("audio/camera.mp3");
+  netSound = loadSound("audio/swing.mp3");
   correct_bell = loadSound("audio/correct.mp3");
   wrong = loadSound("audio/wrong.mp3");
   lose = loadSound("audio/lose.mp3");
@@ -231,15 +233,6 @@ function gameplay_loop() {
   netUpdate();
   background(backgroundImage);
 
-  push();
-  translate(width, 0);
-  scale(-1.0, 1.0);
-  // draw hand
-  if (predictions) {
-    bound = draw_viewfinder(predictions, false);
-  }
-  pop();
-
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
     sprites.length <= 0 ||
@@ -310,6 +303,9 @@ function gameplay_loop() {
 
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
+        let speciesType = sprites[i].isInvasive ? "invasive" : "native";
+
+        sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
 
         if (sprites[i].isInvasive) {
           imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
@@ -329,6 +325,15 @@ function gameplay_loop() {
 
     let isNetHovering = netSpeciesHoverChecker(sprites[i]);
     sprites[i].displayNetInfo(isNetHovering);
+
+    push();
+    translate(width, 0);
+    scale(-1.0, 1.0);
+    // draw hand
+    if (predictions) {
+      bound = draw_viewfinder(predictions, false);
+    }
+    pop();
   }
   // Check if furthest sprite has gone off screen
   // Delete from list to prevent from getting unnecessarily long
@@ -405,7 +410,20 @@ const ws = new WebSocket("ws://localhost:8005");
 
 ws.onopen = () => {
   console.log("Connected to the server");
+
+  const sampleImageData = "base64EncodedImageData";
+  const sampleDescription = "description";
+  const sampleTitle = "hi! :D";
+  const sampleSpecies = "invasive"
+
+  sendDataToServer(sampleImageData, sampleDescription, sampleTitle, sampleSpecies);
 };
+
+function sendDataToServer(imageData, description, title, speciesType) {
+  const dataToSend = JSON.stringify({ image: imageData, description, title, speciesType});
+  ws.send(dataToSend);
+}
+
 
 ws.onmessage = (event) => {
   // console.log(event.data);
@@ -434,6 +452,8 @@ function netUpdate() {
 
   if (isCatching) {
     lockNetPosition();
+    netSound.play();
+
     updateCapture();
   } else if (isPressed) {
     lockNetPosition();
@@ -448,8 +468,15 @@ function drawNetCursor() {
 
   let strokeColor = netControllerData.pressed ? "red" : "black";
   stroke(strokeColor);
-
   noFill();
+
+  strokeWeight(12);
+  stroke(0);
+  circle(net.x, net.y, net.diameter);
+
+  strokeWeight(8);
+  stroke(255);
+
   circle(net.x, net.y, net.diameter);
   pop();
 }
