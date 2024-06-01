@@ -461,8 +461,15 @@ function drawNetCursor() {
 
   let strokeColor = netControllerData.pressed ? "red" : "black";
   stroke(strokeColor);
-
   noFill();
+
+  strokeWeight(12);
+  stroke(0);
+  circle(net.x, net.y, net.diameter);
+
+  strokeWeight(8);
+  stroke(255);
+
   circle(net.x, net.y, net.diameter);
   pop();
 }
