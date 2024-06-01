@@ -25,7 +25,7 @@ const DEFAULT_NET_SIZE = 75;
 // gameplay globals
 let isGameOver = false;
 let mainFont;
-const START_HEALTH = 1;
+const START_HEALTH = 3;
 let ecoHealth = START_HEALTH;
 const PTS = 1;
 
@@ -137,6 +137,9 @@ function preload() {
   // backgroundImage = loadImage('img/grass.jpeg');
 
   cameraSound = loadSound("audio/camera.mp3");
+  correct_bell = loadSound("audio/correct.mp3");
+  wrong = loadSound("audio/wrong.mp3");
+  lose = loadSound("audio/lose.mp3");
   // mainFont = loadFont('assets/Organo.ttf');
   mainFont = loadFont("assets/comic.TTF");
 }
@@ -530,16 +533,22 @@ function updateScore(capturedInvasive) {
   if (capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
+    correct_bell.play();
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
     ecoHealth -= PTS;
+    if(ecoHealth > 0) {
+      wrong.play();
+    }
+    
   }
 
   if (ecoHealth <= 0) {
     //  Lose game when health below 0
     resetGame();
     isGameOver = true;
+    lose.play();
     // netScore = 0;
   }
 
