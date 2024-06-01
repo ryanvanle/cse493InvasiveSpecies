@@ -228,6 +228,7 @@ function gameplay_loop() {
   netUpdate();
   background(backgroundImage);
 
+
   push();
   translate(width, 0);
   scale(-1.0, 1.0);
@@ -236,6 +237,7 @@ function gameplay_loop() {
     bound = draw_viewfinder(predictions, false);
   }
   pop();
+
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
@@ -307,6 +309,9 @@ function gameplay_loop() {
 
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
+        let speciesType = sprites[i].isInvasive ? "invasive" : "native";
+
+        sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
 
         if (sprites[i].isInvasive) {
           imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
@@ -402,7 +407,20 @@ const ws = new WebSocket("ws://localhost:8005");
 
 ws.onopen = () => {
   console.log("Connected to the server");
+
+  const sampleImageData = "base64EncodedImageData";
+  const sampleDescription = "description";
+  const sampleTitle = "hi! :D";
+  const sampleSpecies = "invasive"
+
+  sendDataToServer(sampleImageData, sampleDescription, sampleTitle, sampleSpecies);
 };
+
+function sendDataToServer(imageData, description, title, speciesType) {
+  const dataToSend = JSON.stringify({ image: imageData, description, title, speciesType});
+  ws.send(dataToSend);
+}
+
 
 ws.onmessage = (event) => {
   // console.log(event.data);
