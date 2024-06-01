@@ -227,6 +227,18 @@ function raise_hand() {
 function gameplay_loop() {
   netUpdate();
   background(backgroundImage);
+
+
+  push();
+  translate(width, 0);
+  scale(-1.0, 1.0);
+  // draw hand
+  if (predictions) {
+    bound = draw_viewfinder(predictions, false);
+  }
+  pop();
+
+
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
     sprites.length <= 0 ||
@@ -319,16 +331,6 @@ function gameplay_loop() {
 
     let isNetHovering = netSpeciesHoverChecker(sprites[i]);
     sprites[i].displayNetInfo(isNetHovering);
-
-    push();
-    translate(width, 0);
-    scale(-1.0, 1.0);
-    // draw hand
-    if (predictions) {
-      bound = draw_viewfinder(predictions, false);
-    }
-    pop();
-
   }
   // Check if furthest sprite has gone off screen
   // Delete from list to prevent from getting unnecessarily long
