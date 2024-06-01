@@ -15,6 +15,10 @@ let last_prediction = 0;
 let capture_millis = 0;
 let model_ready = false;
 let hand_raised = false;
+const handposeWorker = new Worker("libraries/hand_worker.js")
+
+const frame_capture_interval = 20;
+let last_frame_capture = 0;
 
 // net globals
 let netControllerData;
@@ -158,24 +162,13 @@ function setup() {
 
   soundFormats("mp3");
 
-  handpose = ml5.handpose(video, () => {
-    model_ready = true;
-  });
-
   minDistanceBetweenSprites = width / 5; // at least this much margin between sprites
 
+  frameRate(30);
   resetGame();
   // Hide the video element, and just show the canvas
   video.hide();
 
-  handpose.on("predict", (results) => {
-    predictions = results[0];
-    if (!hand_raised && results[0] != undefined) {
-      if (results[0].handInViewConfidence > 0.9999) {
-        hand_raised = true;
-      }
-    }
-  });
 }
 
 function hideTopBar() {
@@ -185,8 +178,22 @@ function hideTopBar() {
   }
 }
 
+// capture frame from video
+async function captureFrame() {
+  if (video.elt.readyState === video.elt.HAVE_ENOUGH_DATA) {
+    const offscreenCanvas = new OffscreenCanvas(video.width, video.height);
+    const context = offscreenCanvas.getContext('2d');
+    context.drawImage(video.elt, 0, 0, video.width, video.height);
+
+    const imageBitmap = await createImageBitmap(offscreenCanvas);
+    handposeWorker.postMessage({ imageBitmap }, [imageBitmap]);
+  }
+}
+
 function draw() {
   hideTopBar();
+  captureFrame();
+  
 
   if (!model_ready) {
     menu();
@@ -384,6 +391,25 @@ function getNewSprite() {
   const typeIndex = floor(random(0, invasiveImages.length));
   return new Sprite(typeIndex);
 }
+
+// handworker callbacks
+handposeWorker.onmessage = function(e) {
+  if (e.data.status === 'modelLoaded') {
+    console.log('Handpose model loaded in worker.');
+    model_ready = true;
+  } else if (e.data.status === 'success') {
+    predictions = e.data.predictions;
+    if (predictions != undefined && 
+        predictions.handInViewConfidence > 0.999) {
+      hand_raised = true;
+    }
+    console.log('Hand detected:', predictions);
+  } else if (e.data.status === 'empty') {
+    predictions = [];
+  } else if (e.data.status === 'error') {
+    console.error('Error in worker:', e.data.error);
+  }
+};
 
 // Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw
 
