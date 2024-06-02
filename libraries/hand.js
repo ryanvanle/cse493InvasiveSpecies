@@ -86,7 +86,12 @@ function draw_viewfinder(prediction, shutter) {
   } else {
     noFill();
   }
-  stroke(125);
+  
+  strokeWeight(2);
+  stroke(0);
+
+  
+  
   let w = 200;
   let h = 100;
   let diameter = 40;
@@ -98,6 +103,19 @@ function draw_viewfinder(prediction, shutter) {
     palmbase[0] + diameter / 2,
     palmbase[1] - h / 2
   );
+  
+  w += 2;
+  h += 2;
+  stroke(255);
+  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
+  circle(palmbase[0], palmbase[1] - h / 2, diameter);
+  line(
+    palmbase[0] - diameter / 2,
+    palmbase[1] - h / 2,
+    palmbase[0] + diameter / 2,
+    palmbase[1] - h / 2
+  );
+
   pop();
   return [width - w - (palmbase[0] - w / 2), palmbase[1], w, h];
 }
