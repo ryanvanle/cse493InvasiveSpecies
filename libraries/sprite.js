@@ -6,37 +6,56 @@ const speciesDescriptions = [  // order is consistent with spriteImages in sketc
     name: "Brown Marmorated Stinkbug",
     description:
       "Native to China, Japan, Korea, and other Asian regions",
-    imageIndex: 1,
   },
   {
     name: "Bullfrog",
     description:
       "Bullfrogs are predators that eat practically anything they can catch.",
-    imageIndex: 2,
   },
   {
     name: "Garlic mustard",
     description:
       "This plant blocks sunlight and outcompetes others for moisture and vital nutrients.",
-    imageIndex: 3,
+  },
+  {
+    name: "Apple Maggot",
+    description:
+      "This insect lay eggs in apples. Young worms will consume the fruit",
+  },
+  {
+    name: "Feral Swine",
+    description:
+      "Originally from Europe and Asia, this swine is highly adaptable",
   },
   {
     name: "American Pika",
     description:
       "Herbivores, normally found in mountains of North America",
-    imageIndex: 4,
   },
   {
     name: "Olympic Marmot",
     description:
       "Occurs only in Washington, USA",
-    imageIndex: 5,
   },
   {
     name: "Canada Geese",
     description:
       "Found in the temperate regions of North America",
-    imageIndex: 6,
+  },
+  {
+    name: "Garter Snake",
+    description:
+      "Lives in forests and wetlands of North America",
+  },
+  {
+    name: "Columbia Spotted Frog",
+    description:
+      "A local of the Puget Sound Lowlands",
+  },
+  {
+    name: "Western screech owl",
+    description:
+      "Loves areas near water and lives in Washington year round",
   },
 ];
 // const infoBoxHeight = 200;

@@ -115,9 +115,15 @@ function preload() {
     loadImage("img/invasive/brown_marmorated_stinkbug.png"),
     loadImage("img/invasive/american_bullfrog.png"),
     loadImage("img/invasive/garlic_mustard.jpg"),
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
     loadImage("img/native/american_pika.jpg"),
     loadImage("img/native/olympic_marmot.jpg"),
     loadImage("img/native/canada_geese.jpg"),
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
   ]
 
   // order consistent with spriteImages
@@ -125,9 +131,15 @@ function preload() {
     "img/invasive/brown_marmorated_stinkbug.png",
     "img/invasive/american_bullfrog.png",
     "img/invasive/garlic_mustard.jpg",
+    "img/test1.png",
+    "img/test1.png",
+    "img/test1.png",
     "img/native/american_pika.jpg",
     "img/native/olympic_marmot.jpg",
     "img/native/canada_geese.jpg",
+    "img/test1.png",
+    "img/test1.png",
+    "img/test1.png",
   ];
 
   backgroundImage = loadImage("img/grass.jpeg");
