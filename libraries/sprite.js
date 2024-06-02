@@ -1,7 +1,7 @@
-const spriteHeight = 100;
-const spriteWidth = 100;
+const spriteHeight = 45;
+const spriteWidth = 45;
 const invasiveLikelihood = 0.4;
-const speciesDescriptions = [
+const speciesDescriptions = [  // order is consistent with spriteImages in sketch.js
   {
     name: "Brown Marmorated Stinkbug",
     description:
