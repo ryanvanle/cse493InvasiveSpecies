@@ -26,7 +26,7 @@ const DEFAULT_NET_SIZE = window.innerWidth / 10;
 // gameplay globals
 let isGameOver = false;
 let mainFont;
-const START_HEALTH = 3;
+const START_HEALTH = 10;
 let ecoHealth = START_HEALTH;
 const PTS = 1;
 
