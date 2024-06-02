@@ -111,7 +111,8 @@ let screenEffects = {
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
-  spriteImages = [  // index 0 up to invasive_max_index are invasive species
+  spriteImages = [
+    // index 0 up to invasive_max_index are invasive species
     loadImage("img/invasive/brown_marmorated_stinkbug.png"),
     loadImage("img/invasive/american_bullfrog.png"),
     loadImage("img/invasive/garlic_mustard.jpg"),
@@ -124,10 +125,17 @@ function preload() {
     loadImage("img/native/garter_snake.png"),
     loadImage("img/native/columbia_spotted_frog.png"),
     loadImage("img/native/western_screech_owl.png"),
-  ]
+  ];
+
+  uiImages = [
+    loadImage("img/ui/background-logo.png"),
+    loadImage("img/ui/logo.png"),
+    loadImage("img/ui/game-over-background.png"),
+  ];
 
   // order consistent with spriteImages
-  sourceImage = [  // // index 0 up to invasive_max_index are invasive species
+  sourceImage = [
+    // // index 0 up to invasive_max_index are invasive species
     "img/invasive/brown_marmorated_stinkbug.png",
     "img/invasive/american_bullfrog.png",
     "img/invasive/garlic_mustard.jpg",
@@ -142,6 +150,8 @@ function preload() {
     "img/native/western_screech_owl.png",
   ];
 
+  uiBackgroundImage = loadImage("img/ui/background.png");
+
   backgroundImage = loadImage("img/grass.jpeg");
   // Image Attribution: Image by brgfx on Freepik
   backgroundImage = loadImage("img/rocky_cliff.jpg");
@@ -153,10 +163,14 @@ function preload() {
   wrong = loadSound("audio/wrong.mp3");
   lose = loadSound("audio/lose.mp3");
   // mainFont = loadFont('assets/Organo.ttf');
-  mainFont = loadFont("assets/comic.TTF");
+  // mainFont = loadFont("assets/comic.TTF");
+  mainFont = loadFont("assets/InstrumentSans_Condensed-Bold.ttf");
+  backgroundColor = { r: 255, g: 255, b: 255 };
 }
 
 function setup() {
+  updateUIBackground();
+
   let canvasWidth = window.innerWidth - 100;
   let canvasHeight = (canvasWidth * 9) / 16;
 
@@ -219,28 +233,44 @@ function draw() {
 }
 
 function menu() {
-  background(backgroundImage);
+  background(uiBackgroundImage);
   push();
   textSize(50);
   let s = "Model Loading...";
+  textStyle(BOLD);
+  textStyle(ITALIC);
+  stroke(0);
+  strokeWeight(25);
+  fill(255);
   text(s, (width - textWidth(s)) / 2, height / 2);
   pop();
 }
 
 function raise_hand() {
-  background(backgroundImage);
+  background(uiImages[0]);
+  // image(uiImages[1], 0, 0, width, height);
   push();
-  textSize(100);
-  let s = "Space Invaders";
-  text(s, (width - textWidth(s)) / 2, height / 3);
-  textSize(50);
-  s = "raise hand to start playing";
-  text(s, (width - textWidth(s)) / 2, height / 2);
+  // textSize(100);
+  // let s = "Space Invaders";
+  // text(s, (width - textWidth(s)) / 2, height / 3);
+  textSize(25);
+  s = "Raise your hand to start playing";
+  textStyle(BOLD);
+  textStyle(ITALIC);
+  stroke(0);
+  strokeCap(ROUND);
+  strokeWeight(15);
+  fill(255);
+  // bottom right corner
+  text(s, width - textWidth(s) - 100, height - 100);
   pop();
+
+  // show logo image
 }
 
 function gameplay_loop() {
   netUpdate();
+  updateUIBackground({ r: 220, g: 252, b: 231 });
   background(backgroundImage);
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
@@ -290,6 +320,8 @@ function gameplay_loop() {
         is_closed(predictions) &&
         millis() - capture_millis > 500
       ) {
+        id("top-bar").style.opacity = 1;
+
         cameraSound.play();
         push();
         translate(width, 0);
@@ -303,13 +335,23 @@ function gameplay_loop() {
         imgElement.style.display = "block";
         let speciesType = sprites[i].isInvasive ? "invasive" : "native";
 
-        sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
+        sendDataToServer(
+          "image",
+          sprites[i].description.description,
+          sprites[i].description.name,
+          speciesType
+        ); // replace image later
 
         if (sprites[i].isInvasive) {
-          speciesIdentifier.innerHTML = "Invasive ❌";
+          speciesIdentifier.innerHTML = "Invasive Species";
+          speciesIdentifier.parentElement.style.backgroundColor = "#f43f5e";
+          speciesIdentifier.parentElement.style.borderColor = "#e11d48";
+          speciesIdentifier.parentElement.style.color = "white";
         } else {
-          console.log("Native!!!!");
-          speciesIdentifier.innerHTML = "Native ✅";
+          speciesIdentifier.innerHTML = "Native Species";
+          speciesIdentifier.parentElement.style.backgroundColor = "#22c55e";
+          speciesIdentifier.parentElement.style.borderColor = "#16a34a";
+          speciesIdentifier.parentElement.style.color = "white";
         }
 
         capture_millis = millis();
@@ -340,6 +382,7 @@ function gameplay_loop() {
 
   // frame rate count. uncomment when debugging
   // text(frameRate(), 20, 20);
+  textSize(25);
   text(frameRate(), 20, 20);
 
   drawScreenEffects();
@@ -349,6 +392,17 @@ function keyPressed() {
   if (key === "e") {
     activateRandomScreenEffect(5000);
   }
+}
+
+function resetSpeciesIdentifier() {
+  const speciesIdentifier = id("species-identifier");
+  const parent = speciesIdentifier.parentElement;
+
+  speciesIdentifier.innerHTML = "No species selected";
+  speciesIdentifier.style.color = "black";
+  parent.style.backgroundColor = "white";
+  parent.style.borderColor = "#e5e7eb";
+  parent.style.color = "black";
 }
 
 function resetGame() {
@@ -361,17 +415,31 @@ function resetGame() {
 
 // Game Over Screen
 function gameOver() {
+  updateUIBackground({ r: 251, g: 113, b: 133 });
   // Clear the screen
-  background(backgroundImage);
+  background(uiImages[2]);
   updateHealthBar(0);
   // Ask user to try again
   push();
-  textSize(100);
-  let message = "game over!";
-  textSize(50);
-  text(message, (width - textWidth(message)) / 2, height / 3);
-  message = "raise hand to try again";
-  text(message, (width - textWidth(message)) / 2, height / 2);
+  // textSize(100);
+  // let message = "game over!";
+  // textSize(50);
+  // text(message, (width - textWidth(message)) / 2, height / 3);
+  // message = "raise hand to try again";
+  // text(message, (width - textWidth(message)) / 2, height / 2);
+  // pop();
+
+  textSize(25);
+  s = "Raise your hand to try again.";
+  textStyle(BOLD);
+  textStyle(ITALIC);
+  stroke(0);
+  strokeCap(ROUND);
+  strokeWeight(15);
+  fill(255);
+  // bottom center
+  text(s, (width - textWidth(s)) / 2, height - 100);
+
   pop();
   setTimeout(checkResetGame, 2000);
 
@@ -414,16 +482,25 @@ ws.onopen = () => {
   const sampleImageData = "base64EncodedImageData";
   const sampleDescription = "description";
   const sampleTitle = "hi! :D";
-  const sampleSpecies = "invasive"
+  const sampleSpecies = "invasive";
 
-  sendDataToServer(sampleImageData, sampleDescription, sampleTitle, sampleSpecies);
+  sendDataToServer(
+    sampleImageData,
+    sampleDescription,
+    sampleTitle,
+    sampleSpecies
+  );
 };
 
 function sendDataToServer(imageData, description, title, speciesType) {
-  const dataToSend = JSON.stringify({ image: imageData, description, title, speciesType});
+  const dataToSend = JSON.stringify({
+    image: imageData,
+    description,
+    title,
+    speciesType,
+  });
   ws.send(dataToSend);
 }
-
 
 ws.onmessage = (event) => {
   // console.log(event.data);
@@ -470,17 +547,21 @@ function drawNetCursor() {
   stroke(strokeColor);
   noFill();
 
-  strokeWeight(12);
-  stroke(0);
-  circle(net.x, net.y, net.diameter);
+  // strokeWeight(12);
+  // stroke(0);
+  // circle(net.x, net.y, net.diameter);
 
   strokeWeight(8);
   stroke(255);
-
-  circle(net.x, net.y, net.diameter);
+  setLineDash([20, 20]);
+  // circle(net.x, net.y, net.diameter);
+  ellipse(net.x, net.y, net.diameter, net.diameter);
   pop();
 }
 
+function setLineDash(list) {
+  drawingContext.setLineDash(list);
+}
 
 function lockNetPosition() {
   net.xSpeed = 0;
@@ -566,10 +647,9 @@ function updateScore(capturedInvasive) {
     // captured native animal or failed to capture invasive
     // netScore--;
     ecoHealth -= PTS;
-    if(ecoHealth > 0) {
+    if (ecoHealth > 0) {
       wrong.play();
     }
-    
   }
 
   if (ecoHealth <= 0) {
@@ -607,12 +687,6 @@ function updateHealthBar(percentage) {
 
   const ecoHealthText = id("ecohealth");
   ecoHealthText.innerHTML = Math.round(percentage * 100) + "%";
-
-  if (percentage <= 0.9) {
-    ecoHealthText.style.color = "white";
-  } else {
-    ecoHealthText.style.color = "black";
-  }
 
   if (percentage == 1) {
     healthBar.style.backgroundColor =
@@ -812,6 +886,10 @@ function drawScreenEffects() {
       screenEffects[effectName].update();
     }
   }
+}
+
+function updateUIBackground({ r, g, b } = backgroundColor) {
+  document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 }
 
 /**

@@ -17,75 +17,79 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Jersey+25&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75,400..700;1,75,400..700&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
     <div
-      class="fixed w-full flex items-center space-x-16 justify-center top-4"
+      class="fixed w-full flex items-center space-x-16 justify-center top-4 transition-opacity"
       id="top-bar"
+      style="opacity: 0"
     >
       <div
-        class="bg-black/25 backdrop-blur-lg w-full max-w-3xl border-white/25 border rounded-2xl px-8 py-4 shadow-3xl text-center"
+        class="bg-white max-w-lg backdrop-blur-3xl border rounded-full pl-3 pr-6 py-3 shadow-xl flex items-center justify-center gap-4"
+      >
+        <div class="text-left flex items-center justify-start space-x-4">
+          <img
+            src=""
+            class="w-20 h-20 bg-gray-100 shrink-0 overflow-hidden object-cover border-white/25 border shadow-3xl"
+            style="display: none; border-radius: 50rem 10rem 10rem 50rem"
+            id="species-image"
+          />
+          <div>
+            <h2
+              id="species-name"
+              class="font-semibold text-2xl font-display"
+            ></h2>
+            <p id="species-info" class="text-sm font-medium"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="fixed w-full flex items-center space-x-4 justify-center bottom-8"
+      id="bottom-bar"
+    >
+      <div
+        class="bg-white backdrop-blur-3xl border rounded-full px-6 py-3 shadow-xl flex items-center justify-center gap-4 transition-colors"
       >
         <p
-          class="uppercase font-semibold tracking-widest text-xl italic font-display"
+          class="font-bold tracking-tightest text-base uppercase tracking-widest font-display transition-colors"
           id="species-identifier"
         >
           No species selected
         </p>
-        <div class="text-left flex items-start justify-start space-x-4">
-          <img
-            src=""
-            class="w-20 h-20 shrink-0 rounded-lg overflow-hidden object-cover border-white/25 border shadow-3xl"
-            style="display: none"
-            id="species-image"
-          />
-          <div>
-            <h2 id="species-name" class="font-semibold text-2xl"></h2>
-            <p id="species-info"></p>
-          </div>
-        </div>
       </div>
-    </div>
-    <div
-      class="fixed w-full flex items-center space-x-16 justify-center bottom-4"
-      id="bottom-bar"
-    >
       <div
-        class="bg-black/25 max-w-2xl w-full backdrop-blur-3xl border-white/25 border rounded-2xl px-4 py-4 shadow-3xl flex items-start justify-center gap-16"
+        class="bg-white backdrop-blur-3xl border rounded-full pl-4 pr-3 py-3 shadow-xl flex items-center justify-center gap-4"
       >
-        <div class="space-y-2 text-left w-full">
-          <p
-            class="uppercase font-semibold tracking-widest text-xl italic font-display"
+        <p
+          class="font-bold tracking-tightest text-base uppercase tracking-widest font-display"
+        >
+          Ecosystem Health
+        </p>
+        <div class="w-96">
+          <div
+            class="h-6 w-full bg-gray-500 rounded-full overflow-hidden relative font-display tracking-widest font-bold"
           >
-            Ecosystem Health
-          </p>
-          <div>
             <div
-              class="h-6 w-full bg-gray-800 rounded-md border-white/25 border overflow-hidden relative"
+              id="health-bar"
+              class="transition-colors"
+              style="background-color: #22c55e; width: 100%; height: 100%"
+            />
+            <p
+              class="inline-flex font-medium text-white absolute text-sm right-1 top-0.5"
+              id="ecohealth"
             >
-              <div
-                id="health-bar"
-                style="
-                  background-color: #22c55e;
-                  width: 100%;
-                  height: 100%;
-                  transition: width 0.5s ease-in-out;
-                "
-              />
-              <p
-                class="inline-flex font-medium text-black absolute text-sm right-1 top-0.5"
-                id="ecohealth"
-              >
-                100%
-              </p>
-            </div>
+              100%
+            </p>
           </div>
         </div>
       </div>
     </div>
+
     <script src="sketch.js"></script>
     <script src="net.js" type="module"></script>
   </body>
