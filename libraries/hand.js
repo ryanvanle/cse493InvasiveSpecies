@@ -70,6 +70,11 @@ function drawKeypoints(prediction) {
   return vertices;
 }
 
+function choose(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
 // draw viewfinder on hand location
 function draw_viewfinder(prediction, shutter) {
   let palmbase = prediction.annotations.palmBase[0];
@@ -80,36 +85,19 @@ function draw_viewfinder(prediction, shutter) {
     CANVAS_HEIGHT
   );
 
-  push();
-  if (shutter) {
-    fill(0);
-  } else {
-    noFill();
-  }
-
-  let w = window.innerWidth / 8;
-  let h = window.innerWidth / 8;
+  let w = window.innerWidth / 6;
+  let h = window.innerWidth / 6;
   let diameter = 40;
 
-  // white outline for the black outline
-  // strokeWeight(14);
-  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
+  push();
+  if (shutter) {
+    angleMode(DEGREES);
+    image(uiImages[4], palmbase[0] - w / 2, palmbase[1] - h, w, h);
+    rotate(choose([0, 90, 180, 270]));
+  } else {
+    image(uiImages[3], palmbase[0] - w / 2, palmbase[1] - h, w, h);
+  }
 
-  //black outline
-
-  strokeWeight(10);
-  stroke(255);
-
-  // strokeCap(ROUND);
-
-  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h, 10);
-  circle(palmbase[0], palmbase[1] - h / 2, diameter);
-  line(
-    palmbase[0] - diameter / 2,
-    palmbase[1] - h / 2,
-    palmbase[0] + diameter / 2,
-    palmbase[1] - h / 2
-  );
   pop();
   return [width - w - (palmbase[0] - w / 2), palmbase[1], w, h];
 }

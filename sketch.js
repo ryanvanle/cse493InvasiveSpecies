@@ -131,6 +131,8 @@ function preload() {
     loadImage("img/ui/background-logo.png"),
     loadImage("img/ui/logo.png"),
     loadImage("img/ui/game-over-background.png"),
+    loadImage("img/ui/viewfinder.png"),
+    loadImage("img/ui/viewfinder-flash.png"),
   ];
 
   // order consistent with spriteImages
@@ -150,7 +152,7 @@ function preload() {
     "img/native/western_screech_owl.png",
   ];
 
-  uiBackgroundImage = loadImage("img/ui/background.png");
+  uiBackgroundImage = loadImage("img/ui/washington-background.png");
 
   backgroundImage = loadImage("img/grass.jpeg");
   // Image Attribution: Image by brgfx on Freepik
@@ -266,6 +268,11 @@ function raise_hand() {
   pop();
 
   // show logo image
+}
+
+function disableTopBar() {
+  let topBar = id("top-bar");
+  topBar.style.opacity = 0;
 }
 
 function gameplay_loop() {
@@ -415,6 +422,7 @@ function resetGame() {
 
 // Game Over Screen
 function gameOver() {
+  disableTopBar();
   updateUIBackground({ r: 251, g: 113, b: 133 });
   // Clear the screen
   background(uiImages[2]);

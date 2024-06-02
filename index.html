@@ -56,7 +56,7 @@
         class="bg-white backdrop-blur-3xl border rounded-full px-6 py-3 shadow-xl flex items-center justify-center gap-4 transition-colors"
       >
         <p
-          class="font-bold tracking-tightest text-base uppercase tracking-widest font-display transition-colors"
+          class="font-bold text-lg font-display transition-colors"
           id="species-identifier"
         >
           No species selected
@@ -65,11 +65,7 @@
       <div
         class="bg-white backdrop-blur-3xl border rounded-full pl-4 pr-3 py-3 shadow-xl flex items-center justify-center gap-4"
       >
-        <p
-          class="font-bold tracking-tightest text-base uppercase tracking-widest font-display"
-        >
-          Ecosystem Health
-        </p>
+        <p class="font-bold text-lg font-display">Ecosystem Health</p>
         <div class="w-96">
           <div
             class="h-6 w-full bg-gray-500 rounded-full overflow-hidden relative font-display tracking-widest font-bold"
@@ -80,7 +76,7 @@
               style="background-color: #22c55e; width: 100%; height: 100%"
             />
             <p
-              class="inline-flex font-medium text-white absolute text-sm right-1 top-0.5"
+              class="inline-flex font-bold text-white absolute text-sm right-1 top-0.5"
               id="ecohealth"
             >
               100%
@@ -88,6 +84,23 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div
+      class="flex flex-col items-center justify-center space-y-2 w-32 h-32 bg-white border shadow-xl fixed font-semibold left-4 bottom-4 rounded-full"
+    >
+      <img
+        src="/img/ui/magnifying-glass.svg"
+        alt="magnifying-glass"
+        class="w-16 h-16"
+      />
+      <p class="font-display">Finder</p>
+    </div>
+    <div
+      class="flex flex-col items-center justify-center space-y-2 w-32 h-32 bg-white border shadow-xl fixed font-semibold right-4 bottom-4 rounded-full"
+    >
+      <img src="/img/ui/net.svg" alt="net" class="w-16 h-16" />
+      <p class="font-display">Catcher</p>
     </div>
 
     <script src="sketch.js"></script>
