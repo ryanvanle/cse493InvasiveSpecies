@@ -594,7 +594,7 @@ function updateHealthBar(percentage) {
   healthBar.style.backgroundColor = healthBarColor;
 
   const ecoHealthText = id("ecohealth");
-  ecoHealthText.innerHTML = percentage * 100 + "%";
+  ecoHealthText.innerHTML = Math.round(percentage * 100) + "%";
 
   if (percentage <= 0.9) {
     ecoHealthText.style.color = "white";
