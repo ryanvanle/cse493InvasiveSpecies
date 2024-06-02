@@ -188,17 +188,21 @@ function is_closed(prediction) {
     CANVAS_HEIGHT
   );
   let depth =
-    abs(palmbase[0] - palmbase_2[0]) + abs(palmbase[1] - palmbase_2[1]) * 10;
+    abs(palmbase[0] - palmbase_2[0]) + abs(palmbase[1] - palmbase_2[1]);
 
   let observed_points = [thumbtip, pinkytip, middlefingertip];
-  let distances = 0;
+  let distances = [];
+  // calculate mean
+  let sum = 0;
   for (let i = 0; i < observed_points.length; i++) {
     const point = observed_points[i];
-    distances +=
-      abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]) / depth;
+    let dist =
+      abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]);
+    sum += dist;
   }
+  sum = sum / observed_points.length;  // mean distances
   // palm closes at value < 30
-  let value = distances / observed_points.length;
+  let value = sum / depth;  
   text(value, 20, 40);
-  return value < 60;
+  return value < 1;
 }
