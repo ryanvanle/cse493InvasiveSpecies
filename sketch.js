@@ -6,6 +6,7 @@ let spriteImages;
 let sourceImage;
 let spriteMillis = 0;
 const invasive_max_index = 5; // updated to 5 to total 6 invasive
+let displayed_species; 
 
 // handpose globals
 let video;
@@ -309,6 +310,10 @@ function gameplay_loop() {
         updateScore(false);
         console.log("Failed to capture invasive");
       }
+      if (sprites[i].isDisplayed) {
+        id("top-bar").style.opacity = 0;
+        displayed_species = undefined;
+      }
     }
 
     // Only draw on screen sprites
@@ -327,6 +332,11 @@ function gameplay_loop() {
         is_closed(predictions) &&
         millis() - capture_millis > 500
       ) {
+        if (displayed_species != undefined) {
+          displayed_species.isDisplayed = false;
+        }
+        sprites[i].isDisplayed = true;
+        displayed_species = sprites[i];
         id("top-bar").style.opacity = 1;
 
         cameraSound.play();

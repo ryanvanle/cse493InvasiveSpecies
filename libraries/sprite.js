@@ -1,5 +1,5 @@
-const spriteHeight = 45;
-const spriteWidth = 45;
+const spriteHeight = 70;
+const spriteWidth = 70;
 const invasiveLikelihood = 0.4;
 const speciesDescriptions = [
   // order is consistent with spriteImages in sketch.js
@@ -74,6 +74,7 @@ class Sprite {
     this.spriteMillis = millis();
 
     this.isHighlighted = false;
+    this.isDisplayed = false;
     this.description = speciesDescriptions[this.typeIndex];
 
     // Change this to index the corresponding invasive species
