@@ -67,13 +67,13 @@ const speciesDescriptions = [  // order is consistent with spriteImages in sketc
 
 // Sprite class that holds info for each sprite
 class Sprite {
-  constructor(typeIndex, isInvasive) {
+  constructor(typeIndex, isInvasive, level) {
     this.x = 0; // start on left
     // Random place throughout screen
     this.y = random(2 * spriteHeight, 720 - spriteHeight * 2); // 720 is canvas height
     this.width = spriteWidth;
     this.height = spriteHeight;
-    this.speed = 5;
+    this.speed = 2*(level - 1) + 5; // Speed increments by 2 pixels per level
     this.isInvasive = isInvasive;
     // const descrIndex = floor(random(0, speciesDescriptions.length));
     this.typeIndex = typeIndex;
@@ -81,9 +81,6 @@ class Sprite {
 
     this.isHighlighted = false;
     this.description = speciesDescriptions[this.typeIndex];
-
-    // Change this to index the corresponding invasive species
-    // this.spriteImage = loadImage("images/brown_marmorated_stinkbug.jpg");
     this.offScreen = false;
   }
 

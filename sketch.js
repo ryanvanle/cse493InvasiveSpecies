@@ -25,13 +25,20 @@ let netSound;
 const DEFAULT_NET_SIZE = window.innerWidth / 10;
 
 // gameplay globals
+
+let backgroundImages;
+// let backgroundImages;
 let isGameOver = false;
 let mainFont;
-const START_HEALTH = 10;
-let ecoHealth = START_HEALTH;
+let currLevel = 1;
+// let goalHealth = 10 + (currLevel)*2;
+const MAX_LEVEL = 5;
+const START_HEALTH = 10;  // to test visually
+let ecoHealth = START_HEALTH; // start at 10
+
 const PTS = 1;
 
-let backgroundImage;
+
 
 const SHOW_TOP_BAR = true;
 
@@ -142,9 +149,15 @@ function preload() {
     "img/native/western_screech_owl.png",
   ];
 
-  backgroundImage = loadImage("img/grass.jpeg");
-  // Image Attribution: Image by brgfx on Freepik
-  backgroundImage = loadImage("img/rocky_cliff.jpg");
+  // Image Attribution: Images all by brgfx on Freepik
+  // backgroundImage = loadImage("img/rocky_cliff.jpg");
+  backgroundImages = [
+    loadImage("img/backgrounds/rocky_cliff.jpg"),
+    loadImage("img/backgrounds/boulders.jpg"),
+    loadImage("img/backgrounds/meadow.jpg"),
+    loadImage("img/backgrounds/mountains.jpg")
+  ];
+
   // backgroundImage = loadImage('img/grass.jpeg');
 
   cameraSound = loadSound("audio/camera.mp3");
@@ -191,6 +204,11 @@ function setup() {
       }
     }
   });
+
+  console.log("start health: ");
+  console.log(START_HEALTH);
+  
+  console.log(ecoHealth);
 }
 
 function hideTopBar() {
@@ -208,9 +226,10 @@ function draw() {
   } else if (!hand_raised) {
     if (isGameOver) {
       // Start over screen
-      gameOver();
+      let didWin = currLevel == MAX_LEVEL;
+      gameOver(didWin);
     } else {
-      raise_hand(); // Raise hand to trigger game
+      raise_hand(); // Instruct player to raise hand
     }
   } else {
     // Game in action
@@ -219,7 +238,8 @@ function draw() {
 }
 
 function menu() {
-  background(backgroundImage);
+  let index = min(currLevel-1, backgroundImages.length-1);
+  background(backgroundImages[index]);
   push();
   textSize(50);
   let s = "Model Loading...";
@@ -227,21 +247,39 @@ function menu() {
   pop();
 }
 
+// Draws on screen to instruct user to raise hand to play
 function raise_hand() {
-  background(backgroundImage);
+  // Ensure index within bounds
+  let index = min(currLevel-1, backgroundImages.length-1);
+  background(backgroundImages[index]);
   push();
   textSize(100);
-  let s = "Space Invaders";
+  let s;
+  if(currLevel <= 1) {
+    s = "Space Invaders";    // TITLE SCREEN
+  // } else if(currLevel > MAX_LEVEL) {
+  //   s = "Success!"           // BEAT GAME
+  } else {
+    s = "Level "             // NEW LEVEL
+    s += String(currLevel);
+  }
   text(s, (width - textWidth(s)) / 2, height / 3);
   textSize(50);
   s = "raise hand to start playing";
+  // if(currLevel > MAX_LEVEL) {
+  //   s = "Native species protected";
+  // } else {
+  //   s = "raise hand to start playing";
+  // }
   text(s, (width - textWidth(s)) / 2, height / 2);
   pop();
 }
 
 function gameplay_loop() {
   netUpdate();
-  background(backgroundImage);
+  // background(backgroundImages[currLevel-1]);
+  let index = min(currLevel-1, backgroundImages.length-1);
+  background(backgroundImages[index]);
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
@@ -351,6 +389,7 @@ function keyPressed() {
   }
 }
 
+// Reset for a new round (not levels)
 function resetGame() {
   // netScore = 0;
   ecoHealth = START_HEALTH;
@@ -360,33 +399,57 @@ function resetGame() {
 }
 
 // Game Over Screen
-function gameOver() {
+// Wait for check again
+function gameOver(didWin) {
   // Clear the screen
-  background(backgroundImage);
-  updateHealthBar(0);
+  background(backgroundImages[0]);
+  if(!didWin) {
+    updateHealthBar(0);
+  } else {
+    updateHealthBar(1);
+  }
+  
   // Ask user to try again
   push();
+
   textSize(100);
   let message = "game over!";
-  textSize(50);
+  if(didWin) {
+    message = "Success!";
+  }
   text(message, (width - textWidth(message)) / 2, height / 3);
+  
+  textSize(50);
   message = "raise hand to try again";
+  if(didWin) {
+    message = "Native species protected";
+  }
   text(message, (width - textWidth(message)) / 2, height / 2);
+  
   pop();
-  setTimeout(checkResetGame, 2000);
 
-  // // Watch for hand raise again
-  // if (hand_raised) {
-  //   isGameOver = false;
-  //   updateHealthBar(1);
-  // }
+  // Debounce
+  // Wait 2 sec before detecting another hand raise
+  setTimeout(checkResetGame, 2000);
 }
 
 function checkResetGame() {
   if (hand_raised) {
     isGameOver = false;
+    currLevel = 1;
+    // resetGame();
     updateHealthBar(1);
   }
+}
+
+function advanceLevel() {
+  currLevel++;
+  resetGame(); // sets hand raise to false
+  if(currLevel == MAX_LEVEL) {
+    isGameOver = true;
+    gameOver(true); // did win
+  }
+  updateHealthBar(1);
 }
 
 // generate a new sprite
@@ -401,7 +464,7 @@ function getNewSprite() {
     typeIndex = floor(random(invasive_max_index + 1, spriteImages.length));
   }
   console.log(typeIndex, isInvasive);
-  return new Sprite(typeIndex, isInvasive);
+  return new Sprite(typeIndex, isInvasive, currLevel);
 }
 
 // Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw
@@ -562,18 +625,25 @@ function updateScore(capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
     correct_bell.play();
+    if(ecoHealth >= (START_HEALTH + currLevel*2)) {
+      advanceLevel();
+    }
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
     ecoHealth -= PTS;
-    if(ecoHealth > 0) {
+    if(ecoHealth > 0) { // only play sound if lives left, no interfere with game over sound
       wrong.play();
     }
-    
+    // Only for testing
+    // if(ecoHealth <= (START_HEALTH - currLevel)) {
+    //   advanceLevel();
+    // }
   }
 
   if (ecoHealth <= 0) {
     //  Lose game when health below 0
+    currLevel = 1;
     resetGame();
     isGameOver = true;
     lose.play();
