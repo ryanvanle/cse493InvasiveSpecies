@@ -1,5 +1,5 @@
-const spriteHeight = 45;
-const spriteWidth = 45;
+const spriteHeight = 100;
+const spriteWidth = 100;
 const invasiveLikelihood = 0.4;
 const speciesDescriptions = [
   {

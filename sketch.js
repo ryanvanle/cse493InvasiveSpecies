@@ -21,12 +21,13 @@ let hand_raised = false;
 let netControllerData;
 let net;
 let netScore = 0;
-const DEFAULT_NET_SIZE = 75;
+let netSound;
+const DEFAULT_NET_SIZE = window.innerWidth / 10;
 
 // gameplay globals
 let isGameOver = false;
 let mainFont;
-const START_HEALTH = 10;
+const START_HEALTH = 3;
 let ecoHealth = START_HEALTH;
 const PTS = 1;
 
@@ -135,6 +136,10 @@ function preload() {
   // backgroundImage = loadImage('img/grass.jpeg');
 
   cameraSound = loadSound("audio/camera.mp3");
+  netSound = loadSound("audio/swing.mp3");
+  correct_bell = loadSound("audio/correct.mp3");
+  wrong = loadSound("audio/wrong.mp3");
+  lose = loadSound("audio/lose.mp3");
   // mainFont = loadFont('assets/Organo.ttf');
   mainFont = loadFont("assets/comic.TTF");
 }
@@ -226,15 +231,6 @@ function gameplay_loop() {
   netUpdate();
   background(backgroundImage);
 
-  push();
-  translate(width, 0);
-  scale(-1.0, 1.0);
-  // draw hand
-  if (predictions) {
-    bound = draw_viewfinder(predictions, false);
-  }
-  pop();
-
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
     sprites.length <= 0 ||
@@ -293,6 +289,9 @@ function gameplay_loop() {
         name.innerHTML = sprites[i].description.name;
         imgElement.src = sourceImage[sprites[i].typeIndex];
         imgElement.style.display = "block";
+        let speciesType = sprites[i].isInvasive ? "invasive" : "native";
+
+        sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
 
         if (sprites[i].isInvasive) {
           speciesIdentifier.innerHTML = "Invasive ❌";
@@ -308,6 +307,15 @@ function gameplay_loop() {
 
     let isNetHovering = netSpeciesHoverChecker(sprites[i]);
     sprites[i].displayNetInfo(isNetHovering);
+
+    push();
+    translate(width, 0);
+    scale(-1.0, 1.0);
+    // draw hand
+    if (predictions) {
+      bound = draw_viewfinder(predictions, false);
+    }
+    pop();
   }
   // Check if furthest sprite has gone off screen
   // Delete from list to prevent from getting unnecessarily long
@@ -353,9 +361,16 @@ function gameOver() {
   message = "raise hand to try again";
   text(message, (width - textWidth(message)) / 2, height / 2);
   pop();
-  setTimeout(undefined, 3000);
+  setTimeout(checkResetGame, 2000);
 
-  // Watch for hand raise again
+  // // Watch for hand raise again
+  // if (hand_raised) {
+  //   isGameOver = false;
+  //   updateHealthBar(1);
+  // }
+}
+
+function checkResetGame() {
   if (hand_raised) {
     isGameOver = false;
     updateHealthBar(1);
@@ -383,7 +398,20 @@ const ws = new WebSocket("ws://localhost:8005");
 
 ws.onopen = () => {
   console.log("Connected to the server");
+
+  const sampleImageData = "base64EncodedImageData";
+  const sampleDescription = "description";
+  const sampleTitle = "hi! :D";
+  const sampleSpecies = "invasive"
+
+  sendDataToServer(sampleImageData, sampleDescription, sampleTitle, sampleSpecies);
 };
+
+function sendDataToServer(imageData, description, title, speciesType) {
+  const dataToSend = JSON.stringify({ image: imageData, description, title, speciesType});
+  ws.send(dataToSend);
+}
+
 
 ws.onmessage = (event) => {
   // console.log(event.data);
@@ -412,6 +440,8 @@ function netUpdate() {
 
   if (isCatching) {
     lockNetPosition();
+    netSound.play();
+
     updateCapture();
   } else if (isPressed) {
     lockNetPosition();
@@ -426,8 +456,15 @@ function drawNetCursor() {
 
   let strokeColor = netControllerData.pressed ? "red" : "black";
   stroke(strokeColor);
-
   noFill();
+
+  strokeWeight(12);
+  stroke(0);
+  circle(net.x, net.y, net.diameter);
+
+  strokeWeight(8);
+  stroke(255);
+
   circle(net.x, net.y, net.diameter);
   pop();
 }
@@ -512,16 +549,22 @@ function updateScore(capturedInvasive) {
   if (capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
+    correct_bell.play();
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
     ecoHealth -= PTS;
+    if(ecoHealth > 0) {
+      wrong.play();
+    }
+    
   }
 
   if (ecoHealth <= 0) {
     //  Lose game when health below 0
     resetGame();
     isGameOver = true;
+    lose.play();
     // netScore = 0;
   }
 
