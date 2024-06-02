@@ -2,9 +2,10 @@
 let sprites;
 let nextSpawnDistance;
 let minDistanceBetweenSprites;
-let invasiveImages;
-let nativeImages;
+let spriteImages;
+let sourceImage;
 let spriteMillis = 0;
+const invasive_max_index = 2;
 
 // handpose globals
 let video;
@@ -110,26 +111,35 @@ let screenEffects = {
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
-  invasiveImages = [
+  spriteImages = [  // index 0 up to invasive_max_index are invasive species
     loadImage("img/invasive/brown_marmorated_stinkbug.png"),
     loadImage("img/invasive/american_bullfrog.png"),
     loadImage("img/invasive/garlic_mustard.jpg"),
-  ];
-  nativeImages = [
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
     loadImage("img/native/american_pika.jpg"),
     loadImage("img/native/olympic_marmot.jpg"),
     loadImage("img/native/canada_geese.jpg"),
-  ];
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
+    loadImage("img/test1.png"),
+  ]
 
-  invasiveImagesSource = [
+  // order consistent with spriteImages
+  sourceImage = [  // // index 0 up to invasive_max_index are invasive species
     "img/invasive/brown_marmorated_stinkbug.png",
     "img/invasive/american_bullfrog.png",
     "img/invasive/garlic_mustard.jpg",
-  ];
-  nativeImagesSource = [
+    "img/test1.png",
+    "img/test1.png",
+    "img/test1.png",
     "img/native/american_pika.jpg",
     "img/native/olympic_marmot.jpg",
     "img/native/canada_geese.jpg",
+    "img/test1.png",
+    "img/test1.png",
+    "img/test1.png",
   ];
 
   backgroundImage = loadImage("img/grass.jpeg");
@@ -267,21 +277,7 @@ function gameplay_loop() {
     // Only draw on screen sprites
     if (!sprites[i].offScreen) {
       // INVASIVE
-      if (sprites[i].isInvasive) {
-        // print(invasiveImages);
-        // print("Type index: ");
-        // print(sprites[i].typeIndex);
-        sprites[i].draw(invasiveImages[sprites[i].typeIndex]);
-      } else {
-        // NATIVE
-        // console.log(sprites[i].typeIndex);
-        // print(nativeImages);
-        // print("Type index: ");
-        // print(sprites[i].typeIndex);
-        sprites[i].draw(nativeImages[sprites[i].typeIndex]);
-        // print(sprites[i].typeIndex);
-        // sprites[i].draw(null);
-      }
+      sprites[i].draw(spriteImages[sprites[i].typeIndex]);
     }
     const speciesIdentifier = id("species-identifier");
     const imgElement = id("species-image");
@@ -303,18 +299,16 @@ function gameplay_loop() {
 
         info.innerHTML = sprites[i].description.description;
         name.innerHTML = sprites[i].description.name;
+        imgElement.src = sourceImage[sprites[i].typeIndex];
+        imgElement.style.display = "block";
         let speciesType = sprites[i].isInvasive ? "invasive" : "native";
 
         sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
 
         if (sprites[i].isInvasive) {
-          imgElement.src = invasiveImagesSource[sprites[i].typeIndex];
-          imgElement.style.display = "block";
           speciesIdentifier.innerHTML = "Invasive ❌";
         } else {
           console.log("Native!!!!");
-          imgElement.src = nativeImagesSource[sprites[i].typeIndex];
-          imgElement.style.display = "block";
           speciesIdentifier.innerHTML = "Native ✅";
         }
 
@@ -379,9 +373,6 @@ function gameOver() {
   message = "raise hand to try again";
   text(message, (width - textWidth(message)) / 2, height / 2);
   pop();
-
-  // Debounce if hand immediately detected again so that
-  // "Game Over" shows
   setTimeout(checkResetGame, 2000);
 
   // // Watch for hand raise again
@@ -400,8 +391,17 @@ function checkResetGame() {
 
 // generate a new sprite
 function getNewSprite() {
-  const typeIndex = floor(random(0, invasiveImages.length));
-  return new Sprite(typeIndex);
+  // 40% chance of being invasive
+  // index 0 - 2 are invasive
+  const isInvasive = random(0, 1) < 0.4;
+  let typeIndex;
+  if (isInvasive) {
+    typeIndex = floor(random(0, invasive_max_index));
+  } else {
+    typeIndex = floor(random(invasive_max_index + 1, spriteImages.length));
+  }
+  console.log(typeIndex, isInvasive);
+  return new Sprite(typeIndex, isInvasive);
 }
 
 // Code and Sprite class inspiried by https://editor.p5js.org/jonfroehlich/sketches/sFOMDuDaw
@@ -480,6 +480,7 @@ function drawNetCursor() {
   circle(net.x, net.y, net.diameter);
   pop();
 }
+
 
 function lockNetPosition() {
   net.xSpeed = 0;
@@ -605,7 +606,7 @@ function updateHealthBar(percentage) {
   healthBar.style.backgroundColor = healthBarColor;
 
   const ecoHealthText = id("ecohealth");
-  ecoHealthText.innerHTML = percentage * 100 + "%";
+  ecoHealthText.innerHTML = Math.round(percentage * 100) + "%";
 
   if (percentage <= 0.9) {
     ecoHealthText.style.color = "white";

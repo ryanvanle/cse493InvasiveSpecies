@@ -1,54 +1,81 @@
-const spriteHeight = 100;
-const spriteWidth = 100;
+const spriteHeight = 45;
+const spriteWidth = 45;
 const invasiveLikelihood = 0.4;
-const speciesDescriptions = [
+const speciesDescriptions = [  // order is consistent with spriteImages in sketch.js
   {
     name: "Brown Marmorated Stinkbug",
     description:
-      "Halyomorpha halys is an insect in the family Pentatomidae, native to China, Japan, Korea, and other Asian regions",
-    imageIndex: 1,
+      "Native to China, Japan, Korea, and other Asian regions",
   },
   {
     name: "Bullfrog",
     description:
-      "Bullfrogs are predators that eat practically anything they can catch. They can swallow tree frogs, other amphibians and reptiles such as the western pond turtle, minnows, small birds, and young snakes.",
-    imageIndex: 2,
+      "Bullfrogs are predators that eat practically anything they can catch.",
   },
   {
     name: "Garlic mustard",
     description:
-      "This plant spreads its seeds in the wind and gains a foothold in fields and forests by emerging earlier in spring than many native plants. By the time native species are ready to grow, garlic mustard has blocked their sunlight and outcompeted them for moisture and vital nutrients.",
-    imageIndex: 3,
+      "This plant blocks sunlight and outcompetes others for moisture and vital nutrients.",
+  },
+  {
+    name: "Apple Maggot",
+    description:
+      "This insect lay eggs in apples. Young worms will consume the fruit",
+  },
+  {
+    name: "Feral Swine",
+    description:
+      "Originally from Europe and Asia, this swine is highly adaptable",
+  },
+  {
+    name: "American Pika",
+    description:
+      "Herbivores, normally found in mountains of North America",
+  },
+  {
+    name: "Olympic Marmot",
+    description:
+      "Occurs only in Washington, USA",
+  },
+  {
+    name: "Canada Geese",
+    description:
+      "Found in the temperate regions of North America",
+  },
+  {
+    name: "Garter Snake",
+    description:
+      "Lives in forests and wetlands of North America",
+  },
+  {
+    name: "Columbia Spotted Frog",
+    description:
+      "A local of the Puget Sound Lowlands",
+  },
+  {
+    name: "Western screech owl",
+    description:
+      "Loves areas near water and lives in Washington year round",
   },
 ];
 // const infoBoxHeight = 200;
 
 // Sprite class that holds info for each sprite
 class Sprite {
-  constructor(typeIndex) {
+  constructor(typeIndex, isInvasive) {
     this.x = 0; // start on left
     // Random place throughout screen
     this.y = random(2 * spriteHeight, 720 - spriteHeight * 2); // 720 is canvas height
     this.width = spriteWidth;
     this.height = spriteHeight;
     this.speed = 5;
-    this.isInvasive = random(0, 1) < invasiveLikelihood; // 40% chance of being invasive
+    this.isInvasive = isInvasive;
     // const descrIndex = floor(random(0, speciesDescriptions.length));
     this.typeIndex = typeIndex;
     this.spriteMillis = millis();
 
     this.isHighlighted = false;
-
-    if (this.isInvasive) {
-      this.description = speciesDescriptions[this.typeIndex];
-      // this.spriteImage = invasiveImages[descrIndex];
-    } else {
-      this.description = {
-        name: "Friendly",
-        description: "This is a native species",
-        imageIndex: typeIndex,
-      };
-    }
+    this.description = speciesDescriptions[this.typeIndex];
 
     // Change this to index the corresponding invasive species
     // this.spriteImage = loadImage("images/brown_marmorated_stinkbug.jpg");
@@ -96,24 +123,11 @@ class Sprite {
   }
 
   displayInfo() {
-    let description = this.description == null ? "friendly" : this.description;
     push();
-
     rectMode(CENTER);
-
-    let isFriendly = this.isInvasive;
-    if (isFriendly) {
-      fill("blue");
-    } else {
-      fill("red");
-    }
-
-    stroke(155);
+    noFill();
+    stroke(0, 0, 255);
     rect(this.x, this.y, spriteWidth + 10, spriteHeight + 10);
-    textSize(12);
-    fill(255, 255, 255);
-    textAlign(CENTER);
-    text(this.description.name, this.x, this.y);
     pop();
   }
 

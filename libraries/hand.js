@@ -91,14 +91,12 @@ function draw_viewfinder(prediction, shutter) {
   let h = window.innerHeight / 6;
   let diameter = 40;
 
-
   // white outline for the black outline
   strokeWeight(14);
   rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
 
 
   //black outline
-
 
 
   strokeWeight(10);
