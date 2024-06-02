@@ -28,6 +28,11 @@ const speciesDescriptions = [  // order is consistent with spriteImages in sketc
       "Originally from Europe and Asia, this swine is highly adaptable",
   },
   {
+    name: "European Green Crab",
+    description:
+      "An opportunistic feeder and aggressive invader, they are native to the Atlantic",
+  },
+  {
     name: "American Pika",
     description:
       "Herbivores, normally found in mountains of North America",

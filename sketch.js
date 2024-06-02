@@ -5,7 +5,7 @@ let minDistanceBetweenSprites;
 let spriteImages;
 let sourceImage;
 let spriteMillis = 0;
-const invasive_max_index = 2;
+const invasive_max_index = 5; // updated to 5 to total 6 invasive
 
 // handpose globals
 let video;
@@ -115,15 +115,15 @@ function preload() {
     loadImage("img/invasive/brown_marmorated_stinkbug.png"),
     loadImage("img/invasive/american_bullfrog.png"),
     loadImage("img/invasive/garlic_mustard.jpg"),
-    loadImage("img/test1.png"),
-    loadImage("img/test1.png"),
-    loadImage("img/test1.png"),
+    loadImage("img/invasive/apple_maggot.png"),
+    loadImage("img/invasive/feral_swine.png"),
+    loadImage("img/invasive/european_green_crab.png"),
     loadImage("img/native/american_pika.jpg"),
     loadImage("img/native/olympic_marmot.jpg"),
     loadImage("img/native/canada_geese.jpg"),
-    loadImage("img/test1.png"),
-    loadImage("img/test1.png"),
-    loadImage("img/test1.png"),
+    loadImage("img/native/garter_snake.png"),
+    loadImage("img/native/columbia_spotted_frog.png"),
+    loadImage("img/native/western_screech_owl.png"),
   ]
 
   // order consistent with spriteImages
@@ -131,15 +131,15 @@ function preload() {
     "img/invasive/brown_marmorated_stinkbug.png",
     "img/invasive/american_bullfrog.png",
     "img/invasive/garlic_mustard.jpg",
-    "img/test1.png",
-    "img/test1.png",
-    "img/test1.png",
+    "img/invasive/apple_maggot.png",
+    "img/invasive/feral_swine.png",
+    "img/invasive/european_green_crab.png",
     "img/native/american_pika.jpg",
     "img/native/olympic_marmot.jpg",
     "img/native/canada_geese.jpg",
-    "img/test1.png",
-    "img/test1.png",
-    "img/test1.png",
+    "img/native/garter_snake.png",
+    "img/native/columbia_spotted_frog.png",
+    "img/native/western_screech_owl.png",
   ];
 
   backgroundImage = loadImage("img/grass.jpeg");
