@@ -325,8 +325,8 @@ function raise_hand() {
   stroke(0);
   strokeCap(ROUND);
   strokeWeight(15);
-  
-  
+
+
   // bottom right corner
   text(s, width - textWidth(s) - 100, height - 100);
 
@@ -359,12 +359,8 @@ function disableTopBar() {
 
 function gameplay_loop() {
   netUpdate();
-<<<<<<< HEAD
   updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
   currentTimeMs = getCurrentTimeWithMilliseconds()
-=======
-  updateUIBackground({ r: 220, g: 252, b: 231 }); 
->>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
 
   let index = min(currLevel-1, backgroundImages.length-1);
   background(backgroundImages[index]);
@@ -561,7 +557,7 @@ function gameOver(didWin) {
 =======
   // background(backgroundImages[0]); // old
 
-  
+
 >>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
   // Ask user to try again
   push();
@@ -583,7 +579,7 @@ function gameOver(didWin) {
 
   // Ritesh code
 =======
-  
+
 
 >>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
   textSize(25);
@@ -805,7 +801,7 @@ function updateCapture() {
 // When an animal is captured, updates score according to
 // its identity (native vs invasive)
 function updateScore(capturedInvasive) {
-  
+
   if (capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
@@ -834,7 +830,7 @@ function updateScore(capturedInvasive) {
     lose.play();
     // netScore = 0;
   }
-  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth; 
+  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth;
 
   // displayScore();
 }
