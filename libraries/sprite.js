@@ -1,5 +1,5 @@
-const spriteHeight = 70;
-const spriteWidth = 70;
+const spriteHeight = 90;
+const spriteWidth = 90;
 const invasiveLikelihood = 0.4;
 const speciesDescriptions = [
   // order is consistent with spriteImages in sketch.js
