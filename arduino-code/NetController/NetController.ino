@@ -19,6 +19,9 @@
 // Used for hardware & software SPI
 #define LIS3DH_CS 10
 
+// Vibromotor
+#define VIBROMOTOR_PIN 6
+
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();
 
 
@@ -48,6 +51,10 @@ void connectToWifi() {
 
 void setup() {
   Serial.begin(9600);
+  pinMode(VIBROMOTOR_PIN, OUTPUT);
+  digitalWrite(VIBROMOTOR_PIN, HIGH);
+  delay(2000);
+  digitalWrite(VIBROMOTOR_PIN, LOW);
   while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
   
   if (! lis.begin(0x18)) {   // change this to 0x19 for alternative i2c address

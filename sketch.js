@@ -6,7 +6,7 @@ let spriteImages;
 let sourceImage;
 let spriteMillis = 0;
 const invasive_max_index = 5; // updated to 5 to total 6 invasive
-let displayed_species; 
+let displayed_species;
 
 // handpose globals
 let video;
@@ -37,8 +37,22 @@ const MAX_LEVEL = 5;
 const START_HEALTH = 10;  // to test visually
 let ecoHealth = START_HEALTH; // start at 10
 
+
+let currentHeathColor;
+let isVibeOn;
+let currentTimeMs;
+
+
 const PTS = 1;
 
+const healthBarColorsToRGB = {
+  "#dc2626": "220,38,38",
+  "#f97316": "249,115,22",
+  "#f59e0b": "245,158,11",
+  "#facc15": "250,204,21",
+  "#84cc16": "132,204,22",
+  "#22c55e": "34,197,94"
+};
 
 
 const SHOW_TOP_BAR = true;
@@ -226,8 +240,11 @@ function setup() {
 
   console.log("start health: ");
   console.log(START_HEALTH);
-  
+
   console.log(ecoHealth);
+  currentTimeMs = getCurrentTimeWithMilliseconds();
+
+
 }
 
 function hideTopBar() {
@@ -338,6 +355,7 @@ function disableTopBar() {
 function gameplay_loop() {
   netUpdate();
   updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
+  currentTimeMs = getCurrentTimeWithMilliseconds()
 
   let index = min(currLevel-1, backgroundImages.length-1);
   background(backgroundImages[index]);
@@ -372,6 +390,7 @@ function gameplay_loop() {
         updateScore(false);
         console.log("Failed to capture invasive");
       }
+
       if (sprites[i].isDisplayed) {
         id("top-bar").style.opacity = 0;
         displayed_species = undefined;
@@ -414,12 +433,6 @@ function gameplay_loop() {
         imgElement.style.display = "block";
         let speciesType = sprites[i].isInvasive ? "invasive" : "native";
 
-        sendDataToServer(
-          "image",
-          sprites[i].description.description,
-          sprites[i].description.name,
-          speciesType
-        ); // replace image later
 
         if (sprites[i].isInvasive) {
           speciesIdentifier.innerHTML = "Invasive Species";
@@ -465,6 +478,7 @@ function gameplay_loop() {
   text(frameRate(), 20, 20);
 
   drawScreenEffects();
+  sendDataToServer(currentTimeMs, "249,115,22", false);
 }
 
 function keyPressed() {
@@ -511,14 +525,14 @@ function gameOver(didWin) {
   disableTopBar();
   updateUIBackground({ r: 251, g: 113, b: 133 });
   // background(backgroundImages[0]); // old
-  
+
   background(uiImages[2]);
   if(!didWin) {
     updateHealthBar(0);
   } else {
     updateHealthBar(1);
   }
-  
+
   // Ask user to try again
   push();
 
@@ -529,14 +543,14 @@ function gameOver(didWin) {
   //   message = "Success!";
   // }
   // text(message, (width - textWidth(message)) / 2, height / 3);
-  
+
   // textSize(50);
   // message = "raise hand to try again";
   // if(didWin) {
   //   message = "Native species protected";
   // }
   // text(message, (width - textWidth(message)) / 2, height / 2);
-  
+
   // Ritesh code
   textSize(25);
   s = "Raise your hand to try again.";
@@ -604,19 +618,17 @@ ws.onopen = () => {
   const sampleSpecies = "invasive";
 
   sendDataToServer(
-    sampleImageData,
-    sampleDescription,
-    sampleTitle,
-    sampleSpecies
+    getCurrentTimeWithMilliseconds(),
+    "220,38,38",
+    false,
   );
 };
 
-function sendDataToServer(imageData, description, title, speciesType) {
+function sendDataToServer(currentTimeMs, healthColor, isVibe) {
   const dataToSend = JSON.stringify({
-    image: imageData,
-    description,
-    title,
-    speciesType,
+    currentTimeMs,
+    healthColor,
+    isVibe,
   });
   ws.send(dataToSend);
 }
@@ -649,8 +661,9 @@ function netUpdate() {
   if (isCatching) {
     lockNetPosition();
     netSound.play();
-
     updateCapture();
+    setVibromotor();
+
   } else if (isPressed) {
     lockNetPosition();
   } else {
@@ -797,16 +810,17 @@ function displayScore() {
 
 function updateHealthBar(percentage) {
   let healthBarColors = [
-    "#dc2626",
-    "#f97316",
-    "#f59e0b",
-    "#facc15",
-    "#84cc16",
-    "#22c55e",
+    "#dc2626", // rgb(220, 38, 38)
+    "#f97316", // rgb(249, 115, 22)
+    "#f59e0b", // rgb(245, 158, 11)
+    "#facc15", // rgb(250, 204, 21)
+    "#84cc16", // rgb(132, 204, 22)
+    "#22c55e", // rgb(34, 197, 94)
   ];
 
   let healthBarColor =
     healthBarColors[floor(percentage * healthBarColors.length)];
+  currentHeathColor = healthBarColorsToRGB[healthBarColor];
 
   const healthBar = id("health-bar");
   healthBar.style.width = percentage * 100 + "%";
@@ -818,6 +832,8 @@ function updateHealthBar(percentage) {
   if (percentage == 1) {
     healthBar.style.backgroundColor =
       healthBarColors[healthBarColors.length - 1];
+
+    currentHeathColor = healthBarColorsToRGB[healthBarColors[healthBarColors.length - 1]];
   }
 }
 
@@ -1073,4 +1089,25 @@ function qsa(selector) {
  */
 function gen(tagName) {
   return document.createElement(tagName);
+}
+
+
+function setVibromotor() {
+  isVibeOn = true;
+  setTimeout(function() {
+    isVibeOn = false;
+  },1000)
+}
+
+function getCurrentTimeWithMilliseconds() {
+  const now = new Date(); // Get the current date and time
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const milliseconds = now.getMilliseconds();
+
+  // Format time with milliseconds (example: "15:32:08.123")
+  const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+
+  return timeString;
 }
