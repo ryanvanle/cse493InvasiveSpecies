@@ -218,7 +218,7 @@ function setup() {
   handpose.on("predict", (results) => {
     predictions = results[0];
     if (!hand_raised && results[0] != undefined) {
-      if (results[0].handInViewConfidence > 0.9999) {
+      if (is_closed(predictions)) {
         hand_raised = true;
       }
     }
@@ -502,6 +502,7 @@ function resetGame() {
   sprites = [getNewSprite()];
   nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
+  id("top-bar").style.opacity = 0;
 }
 
 // Game Over Screen
