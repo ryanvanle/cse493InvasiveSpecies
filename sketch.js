@@ -39,7 +39,7 @@ let ecoHealth = START_HEALTH; // start at 10
 
 
 let currentHeathColor;
-let isVibeOn;
+let isVibeOn = false;
 let currentTimeMs;
 
 
@@ -480,7 +480,7 @@ function gameplay_loop() {
   text(frameRate(), 20, 20);
 
   drawScreenEffects();
-  sendDataToServer(currentTimeMs, "249,115,22", false);
+  sendDataToServer(currentTimeMs, currentHeathColor, isVibeOn);
 }
 
 function keyPressed() {
@@ -632,12 +632,14 @@ ws.onopen = () => {
   );
 };
 
-function sendDataToServer(currentTimeMs, healthColor, isVibe) {
+function sendDataToServer(currentTimeMs, healthColor, isVibeOn) {
   const dataToSend = JSON.stringify({
-    currentTimeMs,
-    healthColor,
-    isVibe,
+    "currentTimeMs": currentTimeMs,
+    "healthColor": healthColor,
+    "isVibe": isVibeOn,
   });
+
+  console.log(dataToSend)
   ws.send(dataToSend);
 }
 
@@ -670,7 +672,6 @@ function netUpdate() {
     lockNetPosition();
     netSound.play();
     updateCapture();
-    setVibromotor();
 
   } else if (isPressed) {
     lockNetPosition();
@@ -737,7 +738,7 @@ function isSwingingChecker() {
 }
 
 function updateNetPosition() {
-  net.xSpeed = -netControllerData.y;
+  net.xSpeed = netControllerData.y;
   net.ySpeed = -netControllerData.z;
 
   if (!isInNetBoundsChecker()) return;
@@ -769,6 +770,7 @@ function updateCapture() {
     specie.offScreen = true;
 
     if (specie.isInvasive) {
+      setVibromotor();
       updateScore(true);
     } else {
       updateScore(false);
@@ -1106,7 +1108,7 @@ function setVibromotor() {
   isVibeOn = true;
   setTimeout(function() {
     isVibeOn = false;
-  },1000)
+  },1500)
 }
 
 function getCurrentTimeWithMilliseconds() {
