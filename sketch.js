@@ -768,9 +768,9 @@ function updateScore(capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
     correct_bell.play();
-    // if(ecoHealth >= (START_HEALTH + currLevel)) {
-    //   advanceLevel();
-    // }
+    if(ecoHealth >= START_HEALTH + currLevel) {
+      advanceLevel();
+    }
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
@@ -779,9 +779,9 @@ function updateScore(capturedInvasive) {
       wrong.play();
     }
     // Only for testing
-    if(ecoHealth <= (START_HEALTH - currLevel)) {
-      advanceLevel();
-    }
+    // if(ecoHealth <= (START_HEALTH - currLevel)) {
+    //   advanceLevel();
+    // }
   }
 
   if (ecoHealth <= 0) {
