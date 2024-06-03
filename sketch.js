@@ -289,7 +289,6 @@ function raise_hand() {
   // s = "raise hand to start playing";
   // text(s, (width - textWidth(s)) / 2, height / 2);
 
-  // Ritesh code
   textSize(40);
   let s = "Raise hand and close fist to start playing";
   fill(255); // white
@@ -504,6 +503,7 @@ function resetGame() {
   nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
   id("top-bar").style.opacity = 0;
+  resetSpeciesIdentifier();
 }
 
 // Game Over Screen
@@ -543,7 +543,7 @@ function gameOver(didWin) {
   
 
   textSize(25);
-  s = "Raise your hand to play again.";
+  s = "Raise and make a fist your hand to play again.";
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
