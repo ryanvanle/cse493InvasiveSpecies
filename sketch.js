@@ -45,6 +45,7 @@ let currentTimeMs;
 
 const PTS = 1;
 
+<<<<<<< HEAD
 const healthBarColorsToRGB = {
   "#dc2626": "220,38,38",
   "#f97316": "249,115,22",
@@ -54,6 +55,10 @@ const healthBarColorsToRGB = {
   "#22c55e": "34,197,94"
 };
 
+=======
+let lastResetTime = 0;
+const RESET_DELAY = 3000;
+>>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
 
 const SHOW_TOP_BAR = true;
 
@@ -155,6 +160,7 @@ function preload() {
     loadImage("img/ui/game-over-background.png"),
     loadImage("img/ui/viewfinder.png"),
     loadImage("img/ui/viewfinder-flash.png"),
+    loadImage("img/ui/success.png"),
   ];
 
   // order consistent with spriteImages
@@ -232,7 +238,7 @@ function setup() {
   handpose.on("predict", (results) => {
     predictions = results[0];
     if (!hand_raised && results[0] != undefined) {
-      if (is_closed(predictions)) {
+      if (is_closed(predictions) && millis() - lastResetTime > RESET_DELAY) {
         hand_raised = true;
       }
     }
@@ -276,11 +282,10 @@ function draw() {
 function menu() {
   background(uiBackgroundImage);
 
-  // My code
   // let index = min(currLevel-1, backgroundImages.length-1);
   // background(backgroundImages[index]);
   push();
-  textSize(50);
+  textSize(100);
   let s = "Model Loading...";
   textStyle(BOLD);
   textStyle(ITALIC);
@@ -293,10 +298,8 @@ function menu() {
 
 // Draws on screen to instruct user to raise hand to play
 function raise_hand() {
-  // Ritesh code
   background(uiImages[0]);
 
-  // my code
   // // Ensure index within bounds
   // let index = min(currLevel-1, backgroundImages.length-1);
   // background(backgroundImages[index]);
@@ -308,24 +311,26 @@ function raise_hand() {
   // s = "raise hand to start playing";
   // text(s, (width - textWidth(s)) / 2, height / 2);
 
-  // Ritesh code
-  textSize(25);
-  let s = "Raise your hand to start playing";
+  textSize(40);
+  let s = "Raise hand and close fist to start playing";
+  fill(255); // white
   if(currLevel > 1){
     s = "Level ";
     s += String(currLevel);
+    textSize(100);
+    // fill(137, 240, 118); // bright green
   }
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
   strokeCap(ROUND);
   strokeWeight(15);
-  fill(255);
+  
+  
   // bottom right corner
   text(s, width - textWidth(s) - 100, height - 100);
 
 
-  // My code
   // textSize(100);
   // let s;
   // if(currLevel <= 1) {
@@ -354,8 +359,12 @@ function disableTopBar() {
 
 function gameplay_loop() {
   netUpdate();
+<<<<<<< HEAD
   updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
   currentTimeMs = getCurrentTimeWithMilliseconds()
+=======
+  updateUIBackground({ r: 220, g: 252, b: 231 }); 
+>>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
 
   let index = min(currLevel-1, backgroundImages.length-1);
   background(backgroundImages[index]);
@@ -517,12 +526,17 @@ function resetGame() {
   nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
   id("top-bar").style.opacity = 0;
+  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth;
+  resetSpeciesIdentifier();
+  lastResetTime = millis();
 }
 
 // Game Over Screen
 function gameOver(didWin) {
+
   // Clear the screen
   disableTopBar();
+<<<<<<< HEAD
   updateUIBackground({ r: 251, g: 113, b: 133 });
   // background(backgroundImages[0]); // old
 
@@ -530,13 +544,28 @@ function gameOver(didWin) {
   if(!didWin) {
     updateHealthBar(0);
   } else {
+=======
+  if(didWin) {
+    updateUIBackground({ r: 218, g: 247, b: 166 });
+    background(uiImages[5]);
+>>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
     updateHealthBar(1);
+  } else {
+    // LOSE, GAME OVER
+    updateUIBackground({ r: 251, g: 113, b: 133 });
+    background(uiImages[2]);
+    updateHealthBar(0);
   }
+<<<<<<< HEAD
 
+=======
+  // background(backgroundImages[0]); // old
+
+  
+>>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
   // Ask user to try again
   push();
 
-  // My Code
   // textSize(100);
   // let message = "game over!";
   // if(didWin) {
@@ -550,10 +579,15 @@ function gameOver(didWin) {
   //   message = "Native species protected";
   // }
   // text(message, (width - textWidth(message)) / 2, height / 2);
+<<<<<<< HEAD
 
   // Ritesh code
+=======
+  
+
+>>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
   textSize(25);
-  s = "Raise your hand to try again.";
+  s = "Raise and make a fist your hand to play again.";
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
@@ -771,13 +805,14 @@ function updateCapture() {
 // When an animal is captured, updates score according to
 // its identity (native vs invasive)
 function updateScore(capturedInvasive) {
+  
   if (capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
     correct_bell.play();
-    // if(ecoHealth >= (START_HEALTH + currLevel*2)) {
-    //   advanceLevel();
-    // }
+    if(ecoHealth >= START_HEALTH + currLevel) {
+      advanceLevel();
+    }
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
@@ -786,9 +821,9 @@ function updateScore(capturedInvasive) {
       wrong.play();
     }
     // Only for testing
-    if(ecoHealth <= (START_HEALTH - currLevel)) {
-      advanceLevel();
-    }
+    // if(ecoHealth <= (START_HEALTH - currLevel)) {
+    //   advanceLevel();
+    // }
   }
 
   if (ecoHealth <= 0) {
@@ -799,6 +834,7 @@ function updateScore(capturedInvasive) {
     lose.play();
     // netScore = 0;
   }
+  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth; 
 
   // displayScore();
 }
