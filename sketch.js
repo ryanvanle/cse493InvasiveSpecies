@@ -545,7 +545,7 @@ function gameOver(didWin) {
   
   // Ritesh code
   textSize(25);
-  s = "Raise your hand to play again.";
+  s = "Raise and make a fist your hand to play again.";
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
