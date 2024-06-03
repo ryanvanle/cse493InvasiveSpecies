@@ -39,7 +39,8 @@ let ecoHealth = START_HEALTH; // start at 10
 
 const PTS = 1;
 
-
+let lastResetTime = 0;
+const RESET_DELAY = 3000;
 
 const SHOW_TOP_BAR = true;
 
@@ -219,7 +220,7 @@ function setup() {
   handpose.on("predict", (results) => {
     predictions = results[0];
     if (!hand_raised && results[0] != undefined) {
-      if (is_closed(predictions)) {
+      if (is_closed(predictions) && millis() - lastResetTime > RESET_DELAY) {
         hand_raised = true;
       }
     }
@@ -505,6 +506,7 @@ function resetGame() {
   id("top-bar").style.opacity = 0;
   id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth;
   resetSpeciesIdentifier();
+  lastResetTime = millis();
 }
 
 // Game Over Screen
