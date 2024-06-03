@@ -67,7 +67,7 @@ class Sprite {
     this.y = random(2 * spriteHeight, 720 - spriteHeight * 2); // 720 is canvas height
     this.width = spriteWidth;
     this.height = spriteHeight;
-    this.speed = 2*(level - 1) + 5; // Speed increments by 2 pixels per level
+    this.speed = (level - 1) + 5; // Speed increments by 2 pixels per level
     this.isInvasive = isInvasive;
     // const descrIndex = floor(random(0, speciesDescriptions.length));
     this.typeIndex = typeIndex;

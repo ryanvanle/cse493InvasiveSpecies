@@ -141,6 +141,7 @@ function preload() {
     loadImage("img/ui/game-over-background.png"),
     loadImage("img/ui/viewfinder.png"),
     loadImage("img/ui/viewfinder-flash.png"),
+    loadImage("img/ui/success.png"),
   ];
 
   // order consistent with spriteImages
@@ -508,17 +509,21 @@ function resetGame() {
 
 // Game Over Screen
 function gameOver(didWin) {
+
   // Clear the screen
   disableTopBar();
-  updateUIBackground({ r: 251, g: 113, b: 133 });
-  // background(backgroundImages[0]); // old
-  
-  background(uiImages[2]);
-  if(!didWin) {
-    updateHealthBar(0);
-  } else {
+  if(didWin) {
+    updateUIBackground({ r: 218, g: 247, b: 166 });
+    background(uiImages[5]);
     updateHealthBar(1);
+  } else {
+    // LOSE, GAME OVER
+    updateUIBackground({ r: 251, g: 113, b: 133 });
+    background(uiImages[2]);
+    updateHealthBar(0);
   }
+  // background(backgroundImages[0]); // old
+
   
   // Ask user to try again
   push();
@@ -540,7 +545,7 @@ function gameOver(didWin) {
   
   // Ritesh code
   textSize(25);
-  s = "Raise your hand to try again.";
+  s = "Raise your hand to play again.";
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
