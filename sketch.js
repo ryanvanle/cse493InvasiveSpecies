@@ -503,6 +503,7 @@ function resetGame() {
   nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
   id("top-bar").style.opacity = 0;
+  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth;
   resetSpeciesIdentifier();
 }
 
@@ -762,11 +763,12 @@ function updateCapture() {
 // When an animal is captured, updates score according to
 // its identity (native vs invasive)
 function updateScore(capturedInvasive) {
+  
   if (capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
     correct_bell.play();
-    // if(ecoHealth >= (START_HEALTH + currLevel*2)) {
+    // if(ecoHealth >= (START_HEALTH + currLevel)) {
     //   advanceLevel();
     // }
   } else {
@@ -790,6 +792,7 @@ function updateScore(capturedInvasive) {
     lose.play();
     // netScore = 0;
   }
+  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth; 
 
   // displayScore();
 }
