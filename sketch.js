@@ -260,11 +260,10 @@ function draw() {
 function menu() {
   background(uiBackgroundImage);
 
-  // My code
   // let index = min(currLevel-1, backgroundImages.length-1);
   // background(backgroundImages[index]);
   push();
-  textSize(50);
+  textSize(100);
   let s = "Model Loading...";
   textStyle(BOLD);
   textStyle(ITALIC);
@@ -277,10 +276,8 @@ function menu() {
 
 // Draws on screen to instruct user to raise hand to play
 function raise_hand() {
-  // Ritesh code
   background(uiImages[0]);
 
-  // my code
   // // Ensure index within bounds
   // let index = min(currLevel-1, backgroundImages.length-1);
   // background(backgroundImages[index]);
@@ -293,23 +290,26 @@ function raise_hand() {
   // text(s, (width - textWidth(s)) / 2, height / 2);
 
   // Ritesh code
-  textSize(25);
-  let s = "Raise your hand to start playing";
+  textSize(40);
+  let s = "Raise hand and close fist to start playing";
+  fill(255); // white
   if(currLevel > 1){
     s = "Level ";
     s += String(currLevel);
+    textSize(100);
+    // fill(137, 240, 118); // bright green
   }
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
   strokeCap(ROUND);
   strokeWeight(15);
-  fill(255);
+  
+  
   // bottom right corner
   text(s, width - textWidth(s) - 100, height - 100);
 
 
-  // My code
   // textSize(100);
   // let s;
   // if(currLevel <= 1) {
@@ -338,7 +338,7 @@ function disableTopBar() {
 
 function gameplay_loop() {
   netUpdate();
-  updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
+  updateUIBackground({ r: 220, g: 252, b: 231 }); 
 
   let index = min(currLevel-1, backgroundImages.length-1);
   background(backgroundImages[index]);
@@ -527,7 +527,6 @@ function gameOver(didWin) {
   // Ask user to try again
   push();
 
-  // My Code
   // textSize(100);
   // let message = "game over!";
   // if(didWin) {
@@ -542,7 +541,7 @@ function gameOver(didWin) {
   // }
   // text(message, (width - textWidth(message)) / 2, height / 2);
   
-  // Ritesh code
+
   textSize(25);
   s = "Raise your hand to play again.";
   textStyle(BOLD);
