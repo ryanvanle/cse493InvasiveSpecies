@@ -45,7 +45,6 @@ let currentTimeMs;
 
 const PTS = 1;
 
-<<<<<<< HEAD
 const healthBarColorsToRGB = {
   "#dc2626": "220,38,38",
   "#f97316": "249,115,22",
@@ -55,10 +54,8 @@ const healthBarColorsToRGB = {
   "#22c55e": "34,197,94"
 };
 
-=======
 let lastResetTime = 0;
 const RESET_DELAY = 3000;
->>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
 
 const SHOW_TOP_BAR = true;
 
@@ -532,19 +529,9 @@ function gameOver(didWin) {
 
   // Clear the screen
   disableTopBar();
-<<<<<<< HEAD
-  updateUIBackground({ r: 251, g: 113, b: 133 });
-  // background(backgroundImages[0]); // old
-
-  background(uiImages[2]);
-  if(!didWin) {
-    updateHealthBar(0);
-  } else {
-=======
   if(didWin) {
     updateUIBackground({ r: 218, g: 247, b: 166 });
     background(uiImages[5]);
->>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
     updateHealthBar(1);
   } else {
     // LOSE, GAME OVER
@@ -552,13 +539,9 @@ function gameOver(didWin) {
     background(uiImages[2]);
     updateHealthBar(0);
   }
-<<<<<<< HEAD
-
-=======
   // background(backgroundImages[0]); // old
 
 
->>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
   // Ask user to try again
   push();
 
@@ -575,13 +558,8 @@ function gameOver(didWin) {
   //   message = "Native species protected";
   // }
   // text(message, (width - textWidth(message)) / 2, height / 2);
-<<<<<<< HEAD
-
-  // Ritesh code
-=======
 
 
->>>>>>> 743ca70b0555387b87720b88c13596b746356dc5
   textSize(25);
   s = "Raise and make a fist your hand to play again.";
   textStyle(BOLD);
