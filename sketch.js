@@ -6,6 +6,7 @@ let spriteImages;
 let sourceImage;
 let spriteMillis = 0;
 const invasive_max_index = 5; // updated to 5 to total 6 invasive
+let displayed_species; 
 
 // handpose globals
 let video;
@@ -118,7 +119,8 @@ let screenEffects = {
 // Invariant: # of invasive and non-invasive species must be the same.
 // Each Sprite has an image index that is the same across invasive and native variants
 function preload() {
-  spriteImages = [  // index 0 up to invasive_max_index are invasive species
+  spriteImages = [
+    // index 0 up to invasive_max_index are invasive species
     loadImage("img/invasive/brown_marmorated_stinkbug.png"),
     loadImage("img/invasive/american_bullfrog.png"),
     loadImage("img/invasive/garlic_mustard.jpg"),
@@ -131,10 +133,19 @@ function preload() {
     loadImage("img/native/garter_snake.png"),
     loadImage("img/native/columbia_spotted_frog.png"),
     loadImage("img/native/western_screech_owl.png"),
-  ]
+  ];
+
+  uiImages = [
+    loadImage("img/ui/background-logo.png"),
+    loadImage("img/ui/logo.png"),
+    loadImage("img/ui/game-over-background.png"),
+    loadImage("img/ui/viewfinder.png"),
+    loadImage("img/ui/viewfinder-flash.png"),
+  ];
 
   // order consistent with spriteImages
-  sourceImage = [  // // index 0 up to invasive_max_index are invasive species
+  sourceImage = [
+    // // index 0 up to invasive_max_index are invasive species
     "img/invasive/brown_marmorated_stinkbug.png",
     "img/invasive/american_bullfrog.png",
     "img/invasive/garlic_mustard.jpg",
@@ -148,6 +159,10 @@ function preload() {
     "img/native/columbia_spotted_frog.png",
     "img/native/western_screech_owl.png",
   ];
+
+  uiBackgroundImage = loadImage("img/ui/washington-background.png");
+
+  uiBackgroundImage = loadImage("img/ui/washington-background.png");
 
   // Image Attribution: Images all by brgfx on Freepik
   // backgroundImage = loadImage("img/rocky_cliff.jpg");
@@ -166,10 +181,14 @@ function preload() {
   wrong = loadSound("audio/wrong.mp3");
   lose = loadSound("audio/lose.mp3");
   // mainFont = loadFont('assets/Organo.ttf');
-  mainFont = loadFont("assets/comic.TTF");
+  // mainFont = loadFont("assets/comic.TTF");
+  mainFont = loadFont("assets/InstrumentSans_Condensed-Bold.ttf");
+  backgroundColor = { r: 255, g: 255, b: 255 };
 }
 
 function setup() {
+  updateUIBackground();
+
   let canvasWidth = window.innerWidth - 100;
   let canvasHeight = (canvasWidth * 9) / 16;
 
@@ -238,48 +257,88 @@ function draw() {
 }
 
 function menu() {
-  let index = min(currLevel-1, backgroundImages.length-1);
-  background(backgroundImages[index]);
+  background(uiBackgroundImage);
+
+  // My code
+  // let index = min(currLevel-1, backgroundImages.length-1);
+  // background(backgroundImages[index]);
   push();
   textSize(50);
   let s = "Model Loading...";
+  textStyle(BOLD);
+  textStyle(ITALIC);
+  stroke(0);
+  strokeWeight(25);
+  fill(255);
   text(s, (width - textWidth(s)) / 2, height / 2);
   pop();
 }
 
 // Draws on screen to instruct user to raise hand to play
 function raise_hand() {
-  // Ensure index within bounds
-  let index = min(currLevel-1, backgroundImages.length-1);
-  background(backgroundImages[index]);
+  // Ritesh code
+  // background(backgroundImage);
+  background(uiImages[0]);
+
+  // my code
+  // // Ensure index within bounds
+  // let index = min(currLevel-1, backgroundImages.length-1);
+  // background(backgroundImages[index]);
   push();
-  textSize(100);
-  let s;
-  if(currLevel <= 1) {
-    s = "Space Invaders";    // TITLE SCREEN
-  // } else if(currLevel > MAX_LEVEL) {
-  //   s = "Success!"           // BEAT GAME
-  } else {
-    s = "Level "             // NEW LEVEL
-    s += String(currLevel);
-  }
-  text(s, (width - textWidth(s)) / 2, height / 3);
-  textSize(50);
-  s = "raise hand to start playing";
-  // if(currLevel > MAX_LEVEL) {
-  //   s = "Native species protected";
+  // textSize(100);
+  // let s = "Space Invaders";
+  // text(s, (width - textWidth(s)) / 2, height / 3);
+  // textSize(50);
+  // s = "raise hand to start playing";
+  // text(s, (width - textWidth(s)) / 2, height / 2);
+
+  // Ritesh code
+  textSize(25);
+  let s = "Raise your hand to start playing";
+  textStyle(BOLD);
+  textStyle(ITALIC);
+  stroke(0);
+  strokeCap(ROUND);
+  strokeWeight(15);
+  fill(255);
+  // bottom right corner
+  text(s, width - textWidth(s) - 100, height - 100);
+
+
+  // My code
+  // textSize(100);
+  // let s;
+  // if(currLevel <= 1) {
+  //   s = "Space Invaders";    // TITLE SCREEN
+  // // } else if(currLevel > MAX_LEVEL) {
+  // //   s = "Success!"           // BEAT GAME
   // } else {
-  //   s = "raise hand to start playing";
+  //   s = "Level "             // NEW LEVEL
+  //   s += String(currLevel);
   // }
-  text(s, (width - textWidth(s)) / 2, height / 2);
+  // text(s, (width - textWidth(s)) / 2, height / 3);
+  // textSize(50);
+  // s = "raise hand to start playing";
+  // text(s, (width - textWidth(s)) / 2, height / 2);
+
+
   pop();
+
+  // show logo image
+}
+
+function disableTopBar() {
+  let topBar = id("top-bar");
+  topBar.style.opacity = 0;
 }
 
 function gameplay_loop() {
   netUpdate();
-  // background(backgroundImages[currLevel-1]);
+  updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
+
   let index = min(currLevel-1, backgroundImages.length-1);
   background(backgroundImages[index]);
+  // background(backgroundImage);
 
   // If no sprites or last sprite has surpassed nextSpawnDistance, generate another sprite
   if (
@@ -310,6 +369,10 @@ function gameplay_loop() {
         updateScore(false);
         console.log("Failed to capture invasive");
       }
+      if (sprites[i].isDisplayed) {
+        id("top-bar").style.opacity = 0;
+        displayed_species = undefined;
+      }
     }
 
     // Only draw on screen sprites
@@ -328,6 +391,13 @@ function gameplay_loop() {
         is_closed(predictions) &&
         millis() - capture_millis > 500
       ) {
+        if (displayed_species != undefined) {
+          displayed_species.isDisplayed = false;
+        }
+        sprites[i].isDisplayed = true;
+        displayed_species = sprites[i];
+        id("top-bar").style.opacity = 1;
+
         cameraSound.play();
         push();
         translate(width, 0);
@@ -341,13 +411,23 @@ function gameplay_loop() {
         imgElement.style.display = "block";
         let speciesType = sprites[i].isInvasive ? "invasive" : "native";
 
-        sendDataToServer("image", sprites[i].description.description, sprites[i].description.name, speciesType); // replace image later
+        sendDataToServer(
+          "image",
+          sprites[i].description.description,
+          sprites[i].description.name,
+          speciesType
+        ); // replace image later
 
         if (sprites[i].isInvasive) {
-          speciesIdentifier.innerHTML = "Invasive ❌";
+          speciesIdentifier.innerHTML = "Invasive Species";
+          speciesIdentifier.parentElement.style.backgroundColor = "#f43f5e";
+          speciesIdentifier.parentElement.style.borderColor = "#e11d48";
+          speciesIdentifier.parentElement.style.color = "white";
         } else {
-          console.log("Native!!!!");
-          speciesIdentifier.innerHTML = "Native ✅";
+          speciesIdentifier.innerHTML = "Native Species";
+          speciesIdentifier.parentElement.style.backgroundColor = "#22c55e";
+          speciesIdentifier.parentElement.style.borderColor = "#16a34a";
+          speciesIdentifier.parentElement.style.color = "white";
         }
 
         capture_millis = millis();
@@ -378,6 +458,7 @@ function gameplay_loop() {
 
   // frame rate count. uncomment when debugging
   // text(frameRate(), 20, 20);
+  textSize(25);
   text(frameRate(), 20, 20);
 
   drawScreenEffects();
@@ -387,6 +468,28 @@ function keyPressed() {
   if (key === "e") {
     activateRandomScreenEffect(5000);
   }
+}
+
+function resetSpeciesIdentifier() {
+  const speciesIdentifier = id("species-identifier");
+  const parent = speciesIdentifier.parentElement;
+
+  speciesIdentifier.innerHTML = "No species selected";
+  speciesIdentifier.style.color = "black";
+  parent.style.backgroundColor = "white";
+  parent.style.borderColor = "#e5e7eb";
+  parent.style.color = "black";
+}
+
+function resetSpeciesIdentifier() {
+  const speciesIdentifier = id("species-identifier");
+  const parent = speciesIdentifier.parentElement;
+
+  speciesIdentifier.innerHTML = "No species selected";
+  speciesIdentifier.style.color = "black";
+  parent.style.backgroundColor = "white";
+  parent.style.borderColor = "#e5e7eb";
+  parent.style.color = "black";
 }
 
 // Reset for a new round (not levels)
@@ -399,10 +502,13 @@ function resetGame() {
 }
 
 // Game Over Screen
-// Wait for check again
 function gameOver(didWin) {
   // Clear the screen
-  background(backgroundImages[0]);
+  disableTopBar();
+  updateUIBackground({ r: 251, g: 113, b: 133 });
+  // background(backgroundImages[0]); // old
+  
+  background(uiImages[2]);
   if(!didWin) {
     updateHealthBar(0);
   } else {
@@ -412,20 +518,34 @@ function gameOver(didWin) {
   // Ask user to try again
   push();
 
-  textSize(100);
-  let message = "game over!";
-  if(didWin) {
-    message = "Success!";
-  }
-  text(message, (width - textWidth(message)) / 2, height / 3);
+  // My Code
+  // textSize(100);
+  // let message = "game over!";
+  // if(didWin) {
+  //   message = "Success!";
+  // }
+  // text(message, (width - textWidth(message)) / 2, height / 3);
   
-  textSize(50);
-  message = "raise hand to try again";
-  if(didWin) {
-    message = "Native species protected";
-  }
-  text(message, (width - textWidth(message)) / 2, height / 2);
+  // textSize(50);
+  // message = "raise hand to try again";
+  // if(didWin) {
+  //   message = "Native species protected";
+  // }
+  // text(message, (width - textWidth(message)) / 2, height / 2);
   
+  // Ritesh code
+  textSize(25);
+  s = "Raise your hand to try again.";
+  textStyle(BOLD);
+  textStyle(ITALIC);
+  stroke(0);
+  strokeCap(ROUND);
+  strokeWeight(15);
+  fill(255);
+  // bottom center
+  text(s, (width - textWidth(s)) / 2, height - 100);
+
+
   pop();
 
   // Debounce
@@ -477,16 +597,25 @@ ws.onopen = () => {
   const sampleImageData = "base64EncodedImageData";
   const sampleDescription = "description";
   const sampleTitle = "hi! :D";
-  const sampleSpecies = "invasive"
+  const sampleSpecies = "invasive";
 
-  sendDataToServer(sampleImageData, sampleDescription, sampleTitle, sampleSpecies);
+  sendDataToServer(
+    sampleImageData,
+    sampleDescription,
+    sampleTitle,
+    sampleSpecies
+  );
 };
 
 function sendDataToServer(imageData, description, title, speciesType) {
-  const dataToSend = JSON.stringify({ image: imageData, description, title, speciesType});
+  const dataToSend = JSON.stringify({
+    image: imageData,
+    description,
+    title,
+    speciesType,
+  });
   ws.send(dataToSend);
 }
-
 
 ws.onmessage = (event) => {
   // console.log(event.data);
@@ -533,17 +662,21 @@ function drawNetCursor() {
   stroke(strokeColor);
   noFill();
 
-  strokeWeight(12);
-  stroke(0);
-  circle(net.x, net.y, net.diameter);
+  // strokeWeight(12);
+  // stroke(0);
+  // circle(net.x, net.y, net.diameter);
 
   strokeWeight(8);
   stroke(255);
-
-  circle(net.x, net.y, net.diameter);
+  setLineDash([20, 20]);
+  // circle(net.x, net.y, net.diameter);
+  ellipse(net.x, net.y, net.diameter, net.diameter);
   pop();
 }
 
+function setLineDash(list) {
+  drawingContext.setLineDash(list);
+}
 
 function lockNetPosition() {
   net.xSpeed = 0;
@@ -625,9 +758,9 @@ function updateScore(capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
     correct_bell.play();
-    if(ecoHealth >= (START_HEALTH + currLevel*2)) {
-      advanceLevel();
-    }
+    // if(ecoHealth >= (START_HEALTH + currLevel*2)) {
+    //   advanceLevel();
+    // }
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
@@ -636,9 +769,9 @@ function updateScore(capturedInvasive) {
       wrong.play();
     }
     // Only for testing
-    // if(ecoHealth <= (START_HEALTH - currLevel)) {
-    //   advanceLevel();
-    // }
+    if(ecoHealth <= (START_HEALTH - currLevel)) {
+      advanceLevel();
+    }
   }
 
   if (ecoHealth <= 0) {
@@ -677,12 +810,6 @@ function updateHealthBar(percentage) {
 
   const ecoHealthText = id("ecohealth");
   ecoHealthText.innerHTML = Math.round(percentage * 100) + "%";
-
-  if (percentage <= 0.9) {
-    ecoHealthText.style.color = "white";
-  } else {
-    ecoHealthText.style.color = "black";
-  }
 
   if (percentage == 1) {
     healthBar.style.backgroundColor =
@@ -882,6 +1009,10 @@ function drawScreenEffects() {
       screenEffects[effectName].update();
     }
   }
+}
+
+function updateUIBackground({ r, g, b } = backgroundColor) {
+  document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 }
 
 /**

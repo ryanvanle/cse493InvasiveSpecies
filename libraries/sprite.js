@@ -1,11 +1,11 @@
-const spriteHeight = 45;
-const spriteWidth = 45;
+const spriteHeight = 70;
+const spriteWidth = 70;
 const invasiveLikelihood = 0.4;
-const speciesDescriptions = [  // order is consistent with spriteImages in sketch.js
+const speciesDescriptions = [
+  // order is consistent with spriteImages in sketch.js
   {
     name: "Brown Marmorated Stinkbug",
-    description:
-      "Native to China, Japan, Korea, and other Asian regions",
+    description: "Native to China, Japan, Korea, and other Asian regions",
   },
   {
     name: "Bullfrog",
@@ -34,33 +34,27 @@ const speciesDescriptions = [  // order is consistent with spriteImages in sketc
   },
   {
     name: "American Pika",
-    description:
-      "Herbivores, normally found in mountains of North America",
+    description: "Herbivores, normally found in mountains of North America",
   },
   {
     name: "Olympic Marmot",
-    description:
-      "Occurs only in Washington, USA",
+    description: "Occurs only in Washington, USA",
   },
   {
     name: "Canada Geese",
-    description:
-      "Found in the temperate regions of North America",
+    description: "Found in the temperate regions of North America",
   },
   {
     name: "Garter Snake",
-    description:
-      "Lives in forests and wetlands of North America",
+    description: "Lives in forests and wetlands of North America",
   },
   {
     name: "Columbia Spotted Frog",
-    description:
-      "A local of the Puget Sound Lowlands",
+    description: "A local of the Puget Sound Lowlands",
   },
   {
     name: "Western screech owl",
-    description:
-      "Loves areas near water and lives in Washington year round",
+    description: "Loves areas near water and lives in Washington year round",
   },
 ];
 // const infoBoxHeight = 200;
@@ -80,6 +74,7 @@ class Sprite {
     this.spriteMillis = millis();
 
     this.isHighlighted = false;
+    this.isDisplayed = false;
     this.description = speciesDescriptions[this.typeIndex];
     this.offScreen = false;
   }
@@ -112,11 +107,19 @@ class Sprite {
         rectMode(CENTER);
         fill("red");
         stroke("red");
-        rect(this.x, this.y, spriteWidth + 5, spriteHeight + 5);
+        rect(this.x, this.y, spriteWidth + 5, spriteHeight + 5, 10);
+        imageMode(CENTER);
+        image(
+          speciesImage,
+          this.x,
+          this.y,
+          spriteWidth * 1.5,
+          spriteHeight * 1.5
+        );
+      } else {
+        imageMode(CENTER);
+        image(speciesImage, this.x, this.y, spriteWidth, spriteHeight);
       }
-
-      imageMode(CENTER);
-      image(speciesImage, this.x, this.y, spriteWidth, spriteHeight);
       pop();
     } else {
       print("Sprite image was not defined");
@@ -128,8 +131,9 @@ class Sprite {
     push();
     rectMode(CENTER);
     noFill();
-    stroke(0, 0, 255);
-    rect(this.x, this.y, spriteWidth + 10, spriteHeight + 10);
+    stroke(255, 255, 255);
+    strokeWeight(2);
+    rect(this.x, this.y, spriteWidth + 10, spriteHeight + 10, 5);
     pop();
   }
 

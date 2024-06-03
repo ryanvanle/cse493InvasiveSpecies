@@ -70,6 +70,11 @@ function drawKeypoints(prediction) {
   return vertices;
 }
 
+function choose(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
 // draw viewfinder on hand location
 function draw_viewfinder(prediction, shutter) {
   let palmbase = prediction.annotations.palmBase[0];
@@ -80,36 +85,19 @@ function draw_viewfinder(prediction, shutter) {
     CANVAS_HEIGHT
   );
 
-  push();
-  if (shutter) {
-    fill(0);
-  } else {
-    noFill();
-  }
-
   let w = window.innerWidth / 6;
-  let h = window.innerHeight / 6;
+  let h = window.innerWidth / 6;
   let diameter = 40;
 
-  // white outline for the black outline
-  strokeWeight(14);
-  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
+  push();
+  if (shutter) {
+    angleMode(DEGREES);
+    image(uiImages[4], palmbase[0] - w / 2, palmbase[1] - h, w, h);
+    rotate(choose([0, 90, 180, 270]));
+  } else {
+    image(uiImages[3], palmbase[0] - w / 2, palmbase[1] - h, w, h);
+  }
 
-
-  //black outline
-
-
-  strokeWeight(10);
-  stroke(255);
-
-  rect(palmbase[0] - w / 2, palmbase[1] - h, w, h);
-  circle(palmbase[0], palmbase[1] - h / 2, diameter);
-  line(
-    palmbase[0] - diameter / 2,
-    palmbase[1] - h / 2,
-    palmbase[0] + diameter / 2,
-    palmbase[1] - h / 2
-  );
   pop();
   return [width - w - (palmbase[0] - w / 2), palmbase[1], w, h];
 }
@@ -200,17 +188,21 @@ function is_closed(prediction) {
     CANVAS_HEIGHT
   );
   let depth =
-    abs(palmbase[0] - palmbase_2[0]) + abs(palmbase[1] - palmbase_2[1]) * 10;
+    abs(palmbase[0] - palmbase_2[0]) + abs(palmbase[1] - palmbase_2[1]);
 
   let observed_points = [thumbtip, pinkytip, middlefingertip];
-  let distances = 0;
+  let distances = [];
+  // calculate mean
+  let sum = 0;
   for (let i = 0; i < observed_points.length; i++) {
     const point = observed_points[i];
-    distances +=
-      abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]) / depth;
+    let dist =
+      abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]);
+    sum += dist;
   }
+  sum = sum / observed_points.length;  // mean distances
   // palm closes at value < 30
-  let value = distances / observed_points.length;
+  let value = sum / depth;  
   text(value, 20, 40);
-  return value < 60;
+  return value < 1;
 }
