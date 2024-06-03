@@ -3,6 +3,8 @@ const WIDTH = 640.0;
 const HEIGHT = 480.0;
 let CANVAS_WIDTH = window.innerWidth - PADDING;
 let CANVAS_HEIGHT = ((window.innerWidth - PADDING) * 9) / 16;
+let lastShutter;
+const shutterInterval = 100;
 
 if (CANVAS_HEIGHT > window.innerHeight - PADDING) {
   CANVAS_HEIGHT = window.innerHeight - PADDING;
@@ -77,6 +79,9 @@ function choose(choices) {
 
 // draw viewfinder on hand location
 function draw_viewfinder(prediction, shutter) {
+  if (shutter) {
+    lastShutter = millis();
+  }
   let palmbase = prediction.annotations.palmBase[0];
   palmbase = translate_coordinate(
     palmbase[0],
@@ -90,7 +95,7 @@ function draw_viewfinder(prediction, shutter) {
   let diameter = 40;
 
   push();
-  if (shutter) {
+  if (shutter || millis() - lastShutter < shutterInterval) {
     angleMode(DEGREES);
     image(uiImages[4], palmbase[0] - w / 2, palmbase[1] - h, w, h);
     rotate(choose([0, 90, 180, 270]));
@@ -204,5 +209,5 @@ function is_closed(prediction) {
   // palm closes at value < 30
   let value = sum / depth;  
   text(value, 20, 40);
-  return value < 1;
+  return value < 1.1;
 }

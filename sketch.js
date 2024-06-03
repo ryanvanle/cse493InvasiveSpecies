@@ -293,7 +293,7 @@ function raise_hand() {
 
   // Ritesh code
   textSize(25);
-  let s = "Raise your hand to start playing";
+  let s = "Raise your hand and make a fist to start playing";
   if(currLevel > 1){
     s = "Level ";
     s += String(currLevel);
@@ -503,6 +503,7 @@ function resetGame() {
   nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
   id("top-bar").style.opacity = 0;
+  resetSpeciesIdentifier();
 }
 
 // Game Over Screen
