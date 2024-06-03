@@ -201,13 +201,12 @@ function is_closed(prediction) {
   let sum = 0;
   for (let i = 0; i < observed_points.length; i++) {
     const point = observed_points[i];
-    let dist =
-      abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]);
+    let dist = abs(point[0] - palmbase[0]) + abs(point[1] - palmbase[1]);
     sum += dist;
   }
-  sum = sum / observed_points.length;  // mean distances
+  sum = sum / observed_points.length; // mean distances
   // palm closes at value < 30
-  let value = sum / depth;  
-  text(value, 20, 40);
+  let value = sum / depth;
+  // text(value, 20, 40);
   return value < 1.1;
 }

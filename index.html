@@ -23,33 +23,48 @@
   </head>
   <body>
     <div
-      class="fixed w-full flex items-center space-x-16 justify-center top-12 transition-opacity"
+      class="fixed w-full flex items-center space-x-16 justify-center top-8 transition-opacity"
       id="top-bar"
       style="opacity: 0"
     >
       <div
-        class="bg-white max-w-3xl backdrop-blur-3xl border rounded-full pl-3 pr-6 py-3 shadow-xl flex items-center justify-center gap-4"
+        class="bg-white max-w-3xl backdrop-blur-3xl border rounded-full pl-3 pr-6 py-3 shadow-xl flex items-center justify-center gap-4 scale-125"
       >
         <div class="text-left flex items-center justify-start space-x-4">
           <img
             src=""
-            class="w-40 h-40 bg-gray-100 shrink-0 overflow-hidden object-cover border-white/25 border shadow-3xl"
+            class="w-20 h-20 bg-gray-100 shrink-0 overflow-hidden object-cover border-white/25 border shadow-3xl"
             style="display: none; border-radius: 50rem 10rem 10rem 50rem"
             id="species-image"
           />
           <div>
             <h2
               id="species-name"
-              class="font-semibold text-3xl font-display"
+              class="font-semibold text-2xl font-display"
             ></h2>
-            <p id="species-info" class="text-lg font-medium"></p>
+            <p id="species-info" class="font-medium"></p>
           </div>
         </div>
       </div>
     </div>
-
     <div
-      class="fixed w-full flex items-center space-x-4 justify-center bottom-8"
+      class="flex flex-col items-center justify-center space-y-2 w-32 h-32 bg-white border shadow-xl fixed font-semibold left-4 bottom-4 rounded-full"
+    >
+      <img
+        src="/img/ui/magnifying-glass.svg"
+        alt="magnifying-glass"
+        class="w-16 h-16"
+      />
+      <p class="font-display">Finder</p>
+    </div>
+    <div
+      class="flex flex-col items-center justify-center space-y-2 w-32 h-32 bg-white border shadow-xl fixed font-semibold right-4 bottom-4 rounded-full"
+    >
+      <img src="/img/ui/net.svg" alt="net" class="w-16 h-16" />
+      <p class="font-display">Catcher</p>
+    </div>
+    <div
+      class="fixed w-full flex items-center space-x-4 justify-center bottom-8 scale-125"
       id="bottom-bar"
     >
       <div
@@ -60,6 +75,16 @@
           id="species-identifier"
         >
           No species selected
+        </p>
+      </div>
+      <div
+        class="bg-white backdrop-blur-3xl border rounded-full px-6 py-3 shadow-xl flex items-center justify-center gap-4 transition-colors"
+      >
+        <p
+          class="font-bold text-lg font-display transition-colors"
+          id="invasive-remaining"
+        >
+          0 species remaining
         </p>
       </div>
       <div
@@ -84,28 +109,6 @@
           </div>
         </div>
       </div>
-      <div
-        class = "inline-flex">
-        <p class="font-bold text-lg font-display">Remaining species:</p>
-        <p class="font-bold text-lg font-display" id = "invasive-remaining">0</p>
-      </div>
-    </div>
-
-    <div
-      class="flex flex-col items-center justify-center space-y-2 w-32 h-32 bg-white border shadow-xl fixed font-semibold left-4 bottom-4 rounded-full"
-    >
-      <img
-        src="/img/ui/magnifying-glass.svg"
-        alt="magnifying-glass"
-        class="w-16 h-16"
-      />
-      <p class="font-display">Finder</p>
-    </div>
-    <div
-      class="flex flex-col items-center justify-center space-y-2 w-32 h-32 bg-white border shadow-xl fixed font-semibold right-4 bottom-4 rounded-full"
-    >
-      <img src="/img/ui/net.svg" alt="net" class="w-16 h-16" />
-      <p class="font-display">Catcher</p>
     </div>
 
     <script src="sketch.js"></script>

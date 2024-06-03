@@ -34,14 +34,12 @@ let mainFont;
 let currLevel = 1;
 // let goalHealth = 10 + (currLevel)*2;
 const MAX_LEVEL = 5;
-const START_HEALTH = 10;  // to test visually
+const START_HEALTH = 10; // to test visually
 let ecoHealth = START_HEALTH; // start at 10
-
 
 let currentHeathColor;
 let isVibeOn = false;
 let currentTimeMs;
-
 
 const PTS = 1;
 
@@ -51,7 +49,7 @@ const healthBarColorsToRGB = {
   "#f59e0b": "245,158,11",
   "#facc15": "250,204,21",
   "#84cc16": "132,204,22",
-  "#22c55e": "34,197,94"
+  "#22c55e": "34,197,94",
 };
 
 let lastResetTime = 0;
@@ -187,7 +185,7 @@ function preload() {
     loadImage("img/backgrounds/rocky_cliff.jpg"),
     loadImage("img/backgrounds/boulders.jpg"),
     loadImage("img/backgrounds/meadow.jpg"),
-    loadImage("img/backgrounds/mountains.jpg")
+    loadImage("img/backgrounds/mountains.jpg"),
   ];
 
   // backgroundImage = loadImage('img/grass.jpeg');
@@ -241,13 +239,11 @@ function setup() {
     }
   });
 
-  console.log("start health: ");
-  console.log(START_HEALTH);
+  // console.log("start health: ");
+  // console.log(START_HEALTH);
 
-  console.log(ecoHealth);
+  // console.log(ecoHealth);
   currentTimeMs = getCurrentTimeWithMilliseconds();
-
-
 }
 
 function hideTopBar() {
@@ -311,7 +307,7 @@ function raise_hand() {
   textSize(40);
   let s = "Raise hand and close fist to start playing";
   fill(255); // white
-  if(currLevel > 1){
+  if (currLevel > 1) {
     s = "Level ";
     s += String(currLevel);
     textSize(100);
@@ -323,10 +319,8 @@ function raise_hand() {
   strokeCap(ROUND);
   strokeWeight(15);
 
-
   // bottom right corner
   text(s, width - textWidth(s) - 100, height - 100);
-
 
   // textSize(100);
   // let s;
@@ -343,7 +337,6 @@ function raise_hand() {
   // s = "raise hand to start playing";
   // text(s, (width - textWidth(s)) / 2, height / 2);
 
-
   pop();
 
   // show logo image
@@ -357,9 +350,9 @@ function disableTopBar() {
 function gameplay_loop() {
   netUpdate();
   updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
-  currentTimeMs = getCurrentTimeWithMilliseconds()
+  currentTimeMs = getCurrentTimeWithMilliseconds();
 
-  let index = min(currLevel-1, backgroundImages.length-1);
+  let index = min(currLevel - 1, backgroundImages.length - 1);
   background(backgroundImages[index]);
   // background(backgroundImage);
 
@@ -390,7 +383,7 @@ function gameplay_loop() {
       // If failed to capture,
       if (sprites[i].isInvasive) {
         updateScore(false);
-        console.log("Failed to capture invasive");
+        // console.log("Failed to capture invasive");
       }
 
       if (sprites[i].isDisplayed) {
@@ -433,20 +426,19 @@ function gameplay_loop() {
         name.innerHTML = sprites[i].description.name;
         imgElement.src = sourceImage[sprites[i].typeIndex];
         imgElement.style.display = "block";
-        let speciesType = sprites[i].isInvasive ? "invasive" : "native";
-
+        // let speciesType = sprites[i].isInvasive ? "invasive" : "native";
 
         if (sprites[i].isInvasive) {
           speciesIdentifier.innerHTML = "Invasive Species";
           speciesIdentifier.parentElement.style.backgroundColor = "#f43f5e";
           speciesIdentifier.parentElement.style.borderColor = "#e11d48";
-          speciesIdentifier.parentElement.style.color = "white";
         } else {
           speciesIdentifier.innerHTML = "Native Species";
           speciesIdentifier.parentElement.style.backgroundColor = "#22c55e";
           speciesIdentifier.parentElement.style.borderColor = "#16a34a";
-          speciesIdentifier.parentElement.style.color = "white";
         }
+
+        speciesIdentifier.style.color = "white";
 
         capture_millis = millis();
       }
@@ -476,8 +468,8 @@ function gameplay_loop() {
 
   // frame rate count. uncomment when debugging
   // text(frameRate(), 20, 20);
-  textSize(25);
-  text(frameRate(), 20, 20);
+  // textSize(25);
+  // text(frameRate(), 20, 20);
 
   drawScreenEffects();
   sendDataToServer(currentTimeMs, currentHeathColor, isVibeOn);
@@ -500,17 +492,6 @@ function resetSpeciesIdentifier() {
   parent.style.color = "black";
 }
 
-function resetSpeciesIdentifier() {
-  const speciesIdentifier = id("species-identifier");
-  const parent = speciesIdentifier.parentElement;
-
-  speciesIdentifier.innerHTML = "No species selected";
-  speciesIdentifier.style.color = "black";
-  parent.style.backgroundColor = "white";
-  parent.style.borderColor = "#e5e7eb";
-  parent.style.color = "black";
-}
-
 // Reset for a new round (not levels)
 function resetGame() {
   // netScore = 0;
@@ -519,17 +500,19 @@ function resetGame() {
   nextSpawnDistance = random(minDistanceBetweenSprites, width / 3);
   hand_raised = false;
   id("top-bar").style.opacity = 0;
-  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth;
+
+  let remaining = START_HEALTH + currLevel - ecoHealth;
+
+  id("invasive-remaining").innerHTML = `${remaining} species remaining`;
   resetSpeciesIdentifier();
   lastResetTime = millis();
 }
 
 // Game Over Screen
 function gameOver(didWin) {
-
   // Clear the screen
   disableTopBar();
-  if(didWin) {
+  if (didWin) {
     updateUIBackground({ r: 218, g: 247, b: 166 });
     background(uiImages[5]);
     updateHealthBar(1);
@@ -540,7 +523,6 @@ function gameOver(didWin) {
     updateHealthBar(0);
   }
   // background(backgroundImages[0]); // old
-
 
   // Ask user to try again
   push();
@@ -559,7 +541,6 @@ function gameOver(didWin) {
   // }
   // text(message, (width - textWidth(message)) / 2, height / 2);
 
-
   textSize(25);
   s = "Raise and make a fist your hand to play again.";
   textStyle(BOLD);
@@ -570,7 +551,6 @@ function gameOver(didWin) {
   fill(255);
   // bottom center
   text(s, (width - textWidth(s)) / 2, height - 100);
-
 
   pop();
 
@@ -591,7 +571,7 @@ function checkResetGame() {
 function advanceLevel() {
   currLevel++;
   resetGame(); // sets hand raise to false
-  if(currLevel == MAX_LEVEL) {
+  if (currLevel == MAX_LEVEL) {
     isGameOver = true;
     gameOver(true); // did win
   }
@@ -609,7 +589,7 @@ function getNewSprite() {
   } else {
     typeIndex = floor(random(invasive_max_index + 1, spriteImages.length));
   }
-  console.log(typeIndex, isInvasive);
+  // console.log(typeIndex, isInvasive);
   return new Sprite(typeIndex, isInvasive, currLevel);
 }
 
@@ -618,28 +598,24 @@ function getNewSprite() {
 const ws = new WebSocket("ws://localhost:8005");
 
 ws.onopen = () => {
-  console.log("Connected to the server");
+  // console.log("Connected to the server");
 
   const sampleImageData = "base64EncodedImageData";
   const sampleDescription = "description";
   const sampleTitle = "hi! :D";
   const sampleSpecies = "invasive";
 
-  sendDataToServer(
-    getCurrentTimeWithMilliseconds(),
-    "220,38,38",
-    false,
-  );
+  sendDataToServer(getCurrentTimeWithMilliseconds(), "220,38,38", false);
 };
 
 function sendDataToServer(currentTimeMs, healthColor, isVibeOn) {
   const dataToSend = JSON.stringify({
-    "currentTimeMs": currentTimeMs,
-    "healthColor": healthColor,
-    "isVibe": isVibeOn,
+    currentTimeMs: currentTimeMs,
+    healthColor: healthColor,
+    isVibe: isVibeOn,
   });
 
-  console.log(dataToSend)
+  // console.log(dataToSend);
   ws.send(dataToSend);
 }
 
@@ -659,7 +635,7 @@ ws.onmessage = (event) => {
 };
 
 ws.onclose = () => {
-  console.log("Disconnected from the server");
+  // console.log("Disconnected from the server");
 };
 
 function netUpdate() {
@@ -672,7 +648,6 @@ function netUpdate() {
     lockNetPosition();
     netSound.play();
     updateCapture();
-
   } else if (isPressed) {
     lockNetPosition();
   } else {
@@ -760,7 +735,7 @@ function isInNetBoundsChecker() {
 }
 
 function updateCapture() {
-  console.log("in updateCapture");
+  // console.log("in updateCapture");
 
   for (let specie of sprites) {
     if (specie.offScreen) continue;
@@ -781,19 +756,19 @@ function updateCapture() {
 // When an animal is captured, updates score according to
 // its identity (native vs invasive)
 function updateScore(capturedInvasive) {
-
   if (capturedInvasive) {
     // netScore += 1;
     ecoHealth += PTS;
     correct_bell.play();
-    if(ecoHealth >= START_HEALTH + currLevel) {
+    if (ecoHealth >= START_HEALTH + currLevel) {
       advanceLevel();
     }
   } else {
     // captured native animal or failed to capture invasive
     // netScore--;
     ecoHealth -= PTS;
-    if(ecoHealth > 0) { // only play sound if lives left, no interfere with game over sound
+    if (ecoHealth > 0) {
+      // only play sound if lives left, no interfere with game over sound
       wrong.play();
     }
     // Only for testing
@@ -810,9 +785,9 @@ function updateScore(capturedInvasive) {
     lose.play();
     // netScore = 0;
   }
-  id("invasive-remaining").innerHTML = START_HEALTH + currLevel - ecoHealth;
-
-  // displayScore();
+  id("invasive-remaining").innerHTML = `${
+    START_HEALTH + currLevel - ecoHealth
+  } species remaining`;
 }
 
 function displayScore() {
@@ -845,7 +820,8 @@ function updateHealthBar(percentage) {
     healthBar.style.backgroundColor =
       healthBarColors[healthBarColors.length - 1];
 
-    currentHeathColor = healthBarColorsToRGB[healthBarColors[healthBarColors.length - 1]];
+    currentHeathColor =
+      healthBarColorsToRGB[healthBarColors[healthBarColors.length - 1]];
   }
 }
 
@@ -1103,12 +1079,11 @@ function gen(tagName) {
   return document.createElement(tagName);
 }
 
-
 function setVibromotor() {
   isVibeOn = true;
-  setTimeout(function() {
+  setTimeout(function () {
     isVibeOn = false;
-  },1500)
+  }, 1500);
 }
 
 function getCurrentTimeWithMilliseconds() {
@@ -1119,7 +1094,11 @@ function getCurrentTimeWithMilliseconds() {
   const milliseconds = now.getMilliseconds();
 
   // Format time with milliseconds (example: "15:32:08.123")
-  const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+  const timeString = `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milliseconds
+    .toString()
+    .padStart(3, "0")}`;
 
   return timeString;
 }
