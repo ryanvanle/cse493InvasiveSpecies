@@ -277,7 +277,6 @@ function menu() {
 // Draws on screen to instruct user to raise hand to play
 function raise_hand() {
   // Ritesh code
-  // background(backgroundImage);
   background(uiImages[0]);
 
   // my code
@@ -295,6 +294,10 @@ function raise_hand() {
   // Ritesh code
   textSize(25);
   let s = "Raise your hand to start playing";
+  if(currLevel > 1){
+    s = "Level ";
+    s += String(currLevel);
+  }
   textStyle(BOLD);
   textStyle(ITALIC);
   stroke(0);
