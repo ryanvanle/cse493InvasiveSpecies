@@ -97,8 +97,8 @@ function draw_viewfinder(prediction, shutter) {
   push();
   if (shutter || millis() - lastShutter < shutterInterval) {
     angleMode(DEGREES);
-    image(uiImages[4], palmbase[0] - w / 2, palmbase[1] - h, w, h);
     rotate(choose([0, 90, 180, 270]));
+    image(uiImages[4], palmbase[0] - w / 2, palmbase[1] - h, w, h);
   } else {
     image(uiImages[3], palmbase[0] - w / 2, palmbase[1] - h, w, h);
   }

@@ -58,8 +58,8 @@ const RESET_DELAY = 3000;
 const SHOW_TOP_BAR = true;
 
 net = {
-  x: Number(300 / 2),
-  y: Number(200 / 2),
+  x: Number(500 / 2),
+  y: Number(500 / 2),
   xSpeed: 0,
   ySpeed: 0,
   diameter: DEFAULT_NET_SIZE,
@@ -347,6 +347,7 @@ function disableTopBar() {
   topBar.style.opacity = 0;
 }
 
+
 function gameplay_loop() {
   netUpdate();
   updateUIBackground({ r: 220, g: 252, b: 231 }); // ritesh
@@ -437,8 +438,17 @@ function gameplay_loop() {
           speciesIdentifier.parentElement.style.backgroundColor = "#22c55e";
           speciesIdentifier.parentElement.style.borderColor = "#16a34a";
         }
-
         speciesIdentifier.style.color = "white";
+
+        if (currLevel == 4) {
+          speciesIdentifier.innerHTML = "Hidden";
+          speciesIdentifier.style.color = "Black";
+          speciesIdentifier.parentElement.style.backgroundColor = "#fde047";
+          speciesIdentifier.parentElement.style.borderColor = "#facc15";
+          
+        }
+
+        
 
         capture_millis = millis();
       }
@@ -476,9 +486,9 @@ function gameplay_loop() {
 }
 
 function keyPressed() {
-  if (key === "e") {
-    activateRandomScreenEffect(5000);
-  }
+  //if (key === "e") {
+    //activateRandomScreenEffect(5000);
+  //}
 }
 
 function resetSpeciesIdentifier() {
@@ -565,6 +575,13 @@ function checkResetGame() {
     currLevel = 1;
     // resetGame();
     updateHealthBar(1);
+  }
+}
+
+// debugging code to advance level
+function keyPressed() {
+  if (key == 'a') {
+    advanceLevel();
   }
 }
 
