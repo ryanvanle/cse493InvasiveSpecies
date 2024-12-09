@@ -82,10 +82,11 @@ function draw_viewfinder(prediction, shutter) {
   if (shutter) {
     lastShutter = millis();
   }
-  let palmbase = prediction.annotations.palmBase[0];
+  //let palmbase = prediction.annotations.palmBase[0];
+  let palmbase = prediction.wrist
   palmbase = translate_coordinate(
-    palmbase[0],
-    palmbase[1],
+    palmbase.x,
+    palmbase.y,
     CANVAS_WIDTH,
     CANVAS_HEIGHT
   );
@@ -156,39 +157,46 @@ function translate_coordinate(x, y, w, h) {
 // function to detect whether hand is closed
 // returns boolean value
 function is_closed(prediction) {
-  let thumbtip = prediction.annotations.thumb[3];
-  let pinkytip = prediction.annotations.pinky[3];
-  let middlefingertip = prediction.annotations.middleFinger[3];
-  let palmbase = prediction.annotations.palmBase[0];
-  let palmbase_2 = prediction.annotations.middleFinger[0];
+  console.log(prediction)
+  let thumbtip = prediction.thumb_tip;
+  let pinkytip = prediction.pinky_finger_tip;
+  let middlefingertip = prediction.middle_finger_tip;
+  let palmbase = prediction.wrist;
+  let palmbase_2 = prediction.middle_finger_dip;
+
+  // let thumbtip = prediction.annotations.thumb[3];
+  // let pinkytip = prediction.annotations.pinky[3];
+  // let middlefingertip = prediction.annotations.middleFinger[3];
+  // let palmbase = prediction.annotations.palmBase[0];
+  // let palmbase_2 = prediction.annotations.middleFinger[0];
   palmbase_2 = translate_coordinate(
-    palmbase_2[0],
-    palmbase_2[1],
+    palmbase_2.x,
+    palmbase_2.y,
     CANVAS_WIDTH,
     CANVAS_HEIGHT
   );
 
   thumbtip = translate_coordinate(
-    thumbtip[0],
-    thumbtip[1],
+    thumbtip.x,
+    thumbtip.y,
     CANVAS_WIDTH,
     CANVAS_HEIGHT
   );
   pinkytip = translate_coordinate(
-    pinkytip[0],
-    pinkytip[1],
+    pinkytip.x,
+    pinkytip.y,
     CANVAS_WIDTH,
     CANVAS_HEIGHT
   );
   middlefingertip = translate_coordinate(
-    middlefingertip[0],
-    middlefingertip[1],
+    middlefingertip.x,
+    middlefingertip.y,
     CANVAS_WIDTH,
     CANVAS_HEIGHT
   );
   palmbase = translate_coordinate(
-    palmbase[0],
-    palmbase[1],
+    palmbase.x,
+    palmbase.y,
     CANVAS_WIDTH,
     CANVAS_HEIGHT
   );

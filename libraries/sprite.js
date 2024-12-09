@@ -64,7 +64,7 @@ class Sprite {
   constructor(typeIndex, isInvasive, level) {
     this.x = 0; // start on left
     // Random place throughout screen
-    this.y = random(2 * spriteHeight, 720 - spriteHeight * 2); // 720 is canvas height
+    this.y = random(2 * spriteHeight, window.innerHeight - 100 - spriteHeight * 2); // 720 is canvas height
     this.width = spriteWidth;
     this.height = spriteHeight;
     this.speed = (level - 1) + 5; // Speed increments by 2 pixels per level

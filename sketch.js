@@ -17,6 +17,7 @@ let last_prediction = 0;
 let capture_millis = 0;
 let model_ready = false;
 let hand_raised = false;
+let handpose;
 
 // net globals
 let netControllerData;
@@ -192,6 +193,8 @@ function preload() {
 
   cameraSound = loadSound("audio/camera.mp3");
   netSound = loadSound("audio/swing.mp3");
+  netSound.setVolume(2);
+  cameraSound.setVolume(2);
   correct_bell = loadSound("audio/correct.mp3");
   wrong = loadSound("audio/wrong.mp3");
   lose = loadSound("audio/lose.mp3");
@@ -199,6 +202,12 @@ function preload() {
   // mainFont = loadFont("assets/comic.TTF");
   mainFont = loadFont("assets/InstrumentSans_Condensed-Bold.ttf");
   backgroundColor = { r: 255, g: 255, b: 255 };
+
+  console.log("Available models:", ml5.handPose)
+  handpose = ml5.handPose(video, () => {
+    model_ready = true;
+    console.log("Model ready")
+  });
 }
 
 function setup() {
@@ -220,9 +229,7 @@ function setup() {
 
   soundFormats("mp3");
 
-  handpose = ml5.handpose(video, () => {
-    model_ready = true;
-  });
+  
 
   minDistanceBetweenSprites = width / 5; // at least this much margin between sprites
 
@@ -230,7 +237,22 @@ function setup() {
   // Hide the video element, and just show the canvas
   video.hide();
 
-  handpose.on("predict", (results) => {
+
+  // handpose.on is deprecated
+  /**
+   * handpose.on("predict", (results) => {
+   * predictions = results[0];
+   * if (!hand_raised && results[0] != undefined) {
+   * if (is_closed(predictions) && millis() - lastResetTime > RESET_DELAY) {
+   *     hand_raised = true;
+   *  }
+   * }
+  * });
+   */
+  
+
+  handpose.detectStart(video, (results) => {
+    //console.log(results)
     predictions = results[0];
     if (!hand_raised && results[0] != undefined) {
       if (is_closed(predictions) && millis() - lastResetTime > RESET_DELAY) {
@@ -440,6 +462,12 @@ function gameplay_loop() {
         }
         speciesIdentifier.style.color = "white";
 
+        if (currLevel > 1) {
+          if (ecoHealth < 9) {
+            activateRandomScreenEffect(5000);
+          }
+        }
+
         if (currLevel == 4) {
           speciesIdentifier.innerHTML = "Hidden";
           speciesIdentifier.style.color = "Black";
@@ -582,6 +610,12 @@ function checkResetGame() {
 function keyPressed() {
   if (key == 'a') {
     advanceLevel();
+  }
+  if (key == 'g') {
+    isGameOver = true;
+  }
+  if (key == 's') {
+    currLevel = 4;
   }
 }
 
@@ -762,9 +796,9 @@ function updateCapture() {
     specie.offScreen = true;
 
     if (specie.isInvasive) {
-      setVibromotor();
       updateScore(true);
     } else {
+      setVibromotor();
       updateScore(false);
     }
   }
@@ -1100,7 +1134,7 @@ function setVibromotor() {
   isVibeOn = true;
   setTimeout(function () {
     isVibeOn = false;
-  }, 1500);
+  }, 1000);
 }
 
 function getCurrentTimeWithMilliseconds() {
